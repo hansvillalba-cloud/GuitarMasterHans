@@ -58,8 +58,151 @@ const ROCK = [
  ["Indie con octavas","Indie y alternativo",2,110,R("6.0+4.2:.5",2)+" 6.3+4.5:.5 6.5+4.7:.5 "+R("6.0+4.2:.5",2)+" 6.3+4.5:.5 5.0+3.2:.5"]
 ];
 
+
+/* ---- ampliación: más melodías, acordes, cejilla, técnicas y solos ---- */
+CURSO[2].l.push(
+ {t:"La cucaracha (tradicional)", b:100, x:"Folclor mexicano de dominio público. Practica el ritmo saltarín y los saltos de cuerda.", tab:"2.1:.5 2.1:.5 2.1:.5 1.1:1 1.5:2 2.1:.5 2.1:.5 2.1:.5 1.1:1 1.5:2 1.1:.5 1.1:.5 1.0:.5 1.0:.5 2.3:.5 2.3:.5 2.1:2"},
+ {t:"Estrellita", b:90, x:"Canción infantil tradicional: ideal para repetir notas con púa alternada.", tab:"2.1:1 2.1:1 1.3:1 1.3:1 1.5:1 1.5:1 1.3:2 1.1:1 1.1:1 1.0:1 1.0:1 2.3:1 2.3:1 2.1:2"},
+ {t:"Fray Jacobo", b:90, x:"Melodía tradicional en canon: tócala con un amigo empezando dos compases después.", tab:R("2.1:1 2.3:1 1.0:1 2.1:1",2)+" "+R("1.0:1 1.1:1 1.3:2",2)+" "+R("1.3:.5 1.5:.5 1.3:.5 1.1:.5 1.0:1 2.1:1",2)+" "+R("2.1:1 3.0:1 2.1:2",2)},
+ {t:"Para Elisa (inicio)", b:90, x:"Beethoven, dominio público. El vaivén entre Mi y Re sostenido pide dedos ágiles y relajados.", tab:"1.0:.5 2.4:.5 1.0:.5 2.4:.5 1.0:.5 2.0:.5 2.3:.5 2.1:.5 3.2:1.5 5.0:.5 4.2:.5 3.2:.5 2.0:1.5 4.2:.5 3.1:.5 2.0:.5 2.1:1.5"},
+ {t:"Noche de paz", b:70, x:"Villancico tradicional. Toca suave y sostén cada nota hasta el siguiente pulso.", tab:"1.3:1.5 1.5:.5 1.3:1 1.0:3 1.3:1.5 1.5:.5 1.3:1 1.0:3 1.10:2 1.10:1 1.7:3 1.8:2 1.8:1 1.3:3"},
+ {t:"Aventura 8-bit (original)", b:140, x:"Melodía original con aire de videojuego clásico: notas cortas, silencios y saltos. (El tema de Mario es de Nintendo y no se puede reproducir.)", tab:"1.0:.25 1.0:.25 r:.25 1.0:.25 r:.25 1.1:.25 1.3:.5 r:.5 3.0:.5 r:.5 1.3:.25 1.0:.25 2.0:.25 2.3:.25 1.0:1"}
+);
+CURSO.push(
+ {n:"7 · Todos los acordes", d:"Abiertos, menores y séptimas. En «Diapasón» tienes los 12 tonos con 9 tipos de acorde.", l:[
+  {t:"Acordes mayores abiertos", b:60, x:"Do, Re, Mi, Sol y La. Mira cada forma en el módulo Diapasón y toca de grave a aguda para comprobar que todas las cuerdas suenen limpias.", tab:"5.3+4.2+3.0+2.1+1.0:2 4.0+3.2+2.3+1.2:2 6.0+5.2+4.2+3.1+2.0+1.0:2 6.3+5.2+4.0+3.0+2.0+1.3:2 5.0+4.2+3.2+2.2+1.0:2"},
+  {t:"Menores y de séptima", b:60, x:"Am, Em, Dm, E7 y A7: los acordes de la tristeza, la tensión y el blues.", tab:"5.0+4.2+3.2+2.1+1.0:2 6.0+5.2+4.2+3.0+2.0+1.0:2 4.0+3.2+2.3+1.1:2 6.0+5.2+4.0+3.1+2.0+1.0:2 5.0+4.2+3.0+2.2+1.0:2"},
+  {t:"Cambios: Do–Sol–Lam–Fa", b:70, x:"La progresión de miles de canciones. Prepara el siguiente acorde durante el último pulso para cambiar sin parar el ritmo.", tab:R("5.3+4.2+3.0+2.1+1.0:2 6.3+5.2+4.0+3.0+2.0+1.3:2 5.0+4.2+3.2+2.1+1.0:2 4.3+3.2+2.1+1.0:2",2)}]},
+ {n:"8 · Cejilla", d:"Acordes móviles: aprende una forma y tendrás los doce tonos.", l:[
+  {t:"Cejilla en Fa mayor", b:60, x:"El índice presiona las seis cuerdas en el traste 1 y los otros dedos arman la forma de Mi. Presiona con el lado del dedo, no con la yema.", tab:R("6.1+5.3+4.3+3.2+2.1+1.1:4",3)},
+  {t:"Forma de Mi móvil: Fa, Sol, La, Si", b:60, x:"La misma forma se desliza por el mástil: el traste de la cejilla da el nombre del acorde.", tab:"6.1+5.3+4.3+3.2+2.1+1.1:2 6.3+5.5+4.5+3.4+2.3+1.3:2 6.5+5.7+4.7+3.6+2.5+1.5:2 6.7+5.9+4.9+3.8+2.7+1.7:2"},
+  {t:"Forma de La móvil: Si♭, Do, Re, Mi", b:60, x:"Otra forma, con la raíz en la quinta cuerda. Con las dos formas tocas cualquier acorde mayor.", tab:"5.1+4.3+3.3+2.3+1.1:2 5.3+4.5+3.5+2.5+1.3:2 5.5+4.7+3.7+2.7+1.5:2 5.7+4.9+3.9+2.9+1.7:2"}]},
+ {n:"9 · Técnicas expresivas", d:"Bends, slides, vibrato y legato: lo que hace que la guitarra «cante».", l:[
+  {t:"Bend de un tono", b:70, x:"Empuja la cuerda hacia arriba con tres dedos hasta llegar a la nota dos trastes más aguda. En la pista, 8↑ es el traste 8 con bend: la app espera la nota de destino. Compruébala con el afinador.", tab:R("2.8:1 2.8b2:2 r:1",3)},
+  {t:"Bend de medio tono", b:70, x:"Un bend corto, de un solo traste de diferencia. Es el «lamento» típico del blues.", tab:R("1.5:1 1.5b1:2 r:1",3)},
+  {t:"Slides", b:80, x:"Pulsa la nota, no sueltes y desliza el dedo hasta la siguiente manteniendo la presión.", tab:R("4.5:.5 4.7:1.5",2)+" "+R("4.7:.5 4.5:1.5",2)+" "+R("3.5:.5 3.9:1.5",2)},
+  {t:"Vibrato y legato", b:70, x:"Vibrato: mueve el dedo y la muñeca como abanicando sobre notas largas. Legato: sube (hammer-on) y baja (pull-off) con los dedos sin volver a tocar con la púa.", tab:"2.8:2 1.5:2 1.8:4 "+R("3.5:.5 3.7:.5",4)+" "+R("2.5:.5 2.8:.5",4)}]},
+ {n:"10 · Solos largos", d:"Frases completas para improvisar con sentido.", l:[
+  {t:"Solo en La menor", b:90, x:"Ocho compases de pregunta y respuesta. Cuando lo domines, cambia el orden y el ritmo de las frases para hacerlo tuyo.", tab:"1.5:.5 1.8:.5 1.5:.5 2.8:.5 2.5:1 2.8:.5 2.5:.5 3.7:1 3.5:1 3.5:.5 3.7:.5 2.5:.5 2.8:.5 1.5:1 1.8:1 2.8b2:2 r:1 1.8:.5 1.5:.5 2.8:.5 2.5:.5 3.7:.5 3.5:.5 4.7:.5 4.5:.5 5.7:.5 5.5:.5 6.8:.5 6.5:3"},
+  {t:"Solo de blues en Mi", b:80, x:"Escala de blues arriba en el mástil. Respira entre frases: los silencios también son música.", tab:"1.12:1 1.10:.5 1.7:.5 1.5:1 1.6:.5 1.5:.5 1.3:1 1.0:1 r:1 2.3:.5 2.0:.5 3.2:1 3.0:1 2.0:.5 2.3:.5 1.0:1 1.3:.5 1.5:.5 1.6:.5 1.5:.5 1.3:1 1.0:2"},
+  {t:"Solo melódico con bends", b:80, x:"Mezcla pentatónica, bends y slides en una sola frase cantable.", tab:"2.5:1 2.8b2:2 r:1 1.5:.5 1.8:.5 1.5:1 2.8:.5 2.5:.5 3.7:1 3.5:2"}]}
+);
+/* Riffs originales «al estilo de» cada banda: no copian sus canciones; para temas exactos usa tu archivo Guitar Pro. */
+ROCK.push(
+ ["Estadio melódico en La","Hard rock",1,100,R("5.0:.5 4.2:.5 3.2:.5 2.0:.5 3.2:.5 4.2:.5",2)+" "+R("4.0:.5 3.2:.5 2.3:.5 1.2:.5 2.3:.5 3.2:.5",2)+" 6.0+5.2:1 5.0+4.2:1 4.0+3.2:2","Def Leppard"],
+ ["Funk metal sincopado","Metal",3,110,R("6.0:.25 6.0:.25 r:.5 6.0:.25 6.0:.25 6.3:.5 6.2:.5",4)+" 6.0+5.2:1","Extreme"],
+ ["Riff callejero en Re","Hard rock",2,110,R("4.0:.5 4.3:.5 3.0:.5 3.2:.5 3.0:.5 4.3:.5",2)+" 4.0:2","Guns N' Roses"],
+ ["Swing blusero en Mi","Blues rock",2,95,R("6.0:1 6.3:.5 6.0:.5 5.2:1 6.3:.5 6.0:.5 6.5:.5 6.3:.5 6.0:1",2),"Aerosmith"],
+ ["Punk metal en Mi","Punk",2,150,R("6.0+5.2:.5",4)+" "+R("6.3+5.5:.5",2)+" "+R("6.5+5.7:.5",2)+" "+R("6.3+5.5:.5",2)+" "+R("6.0+5.2:.5",4),"Skid Row"],
+ ["Thrash con palm mute","Metal",3,140,R(R("6.0:.25",6)+" 6.1:.25 6.0:.25",3)+" "+R("6.3+5.5:.25",4)+" "+R("6.2+5.4:.25",4)+" 6.0+5.2:1","Metallica"],
+ ["Stomp teatral de estadio","Rock clásico",1,110,R("5.0+4.2:1 5.0+4.2:1 5.0+4.2:.5 r:.5 5.0+4.2:1",2)+" "+"4.0+3.2:1 4.0+3.2:1 4.0+3.2:.5 r:.5 4.0+3.2:1 "+"6.0+5.2:1 6.0+5.2:1 6.0+5.2:.5 r:.5 6.0+5.2:1","Queen"],
+ ["Blues pesado sincopado en La","Blues rock",2,100,R("5.0:.5 5.0:.5 r:.5 5.3:.5 5.0:.5 4.2:.5 4.0:.5 5.3:.5 5.0:1",2),"Led Zeppelin"],
+ ["Rock de estadio en Re","Hard rock",1,115,"4.0+3.2:1 4.0+3.2:.5 4.0+3.2:.5 5.0+4.2:1 5.0+4.2:1 6.3+5.5:1 6.3+5.5:.5 6.3+5.5:.5 5.0+4.2:2 "+R("4.0+3.2:.5",4),"Bon Jovi"],
+ ["Riff blusero con slides","Blues rock",2,90,R("6.0:.5 6.3:.5 6.5:.5 6.6:.5 6.5:.5 6.3:.5 6.0:1",2)+" "+"5.0:.5 5.3:.5 5.5:.5 5.6:.5 5.5:.5 5.3:.5 5.0:1","Cinderella"],
+ ["Balada acústica sureña","Balada rock",1,76,"6.3:.5 4.0:.5 3.0:.5 2.0:.5 1.3:.5 2.0:.5 5.3:.5 4.2:.5 3.0:.5 2.1:.5 1.0:.5 2.1:.5 4.0:.5 3.2:.5 2.3:.5 1.2:.5 2.3:.5 3.2:.5 6.0:.5 5.2:.5 4.2:.5 3.0:.5 2.0:.5 1.0:.5","Tesla"],
+ ["Glam de fiesta","Glam y hair metal",1,125,R("5.0+4.2:.5 5.0+4.2:.5 4.0+3.2:.5 4.0+3.2:.5 6.0+5.2:1",2)+" "+R("5.0+4.2:.5",4),"Poison"],
+ ["Blues metal lento en Mi","Hard rock",2,75,"6.0+5.2:2 6.3+5.5:1 6.0+5.2:1 6.5+5.7:2 6.3+5.5:1 6.0+5.2:1 3.0:.5 3.2:.5 2.0:.5 2.3:.5 1.0:2","Whitesnake"]
+);
+
+/* ================= DIAPASÓN Y ACORDES ================= */
+const AFIN = [40,45,50,55,59,64];                          // cuerdas 6→1
+const LET = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const TIPOS = {"":"Mayor","m":"Menor","7":"Séptima","m7":"Menor 7","maj7":"Mayor 7","sus4":"Sus4","sus2":"Sus2","5":"Power chord","dim":"Disminuido"};
+const ESC = {acorde:null, mayor:[0,2,4,5,7,9,11], menor:[0,2,3,5,7,8,10], pentm:[0,3,5,7,10], pentM:[0,2,4,7,9], blues:[0,3,5,6,7,10], todas:[0,1,2,3,4,5,6,7,8,9,10,11]};
+const FORMAS = {"":[[0,2,2,1,0,0],[-1,0,2,2,2,0]],"m":[[0,2,2,0,0,0],[-1,0,2,2,1,0]],"7":[[0,2,0,1,0,0],[-1,0,2,0,2,0]],"m7":[[0,2,0,0,0,0],[-1,0,2,0,1,0]],"maj7":[[0,2,1,1,0,0],[-1,0,2,1,2,0]],"sus4":[[0,2,2,2,0,0],[-1,0,2,2,3,0]],"sus2":[null,[-1,0,2,2,0,0]],"5":[[0,2,2,-1,-1,-1],[-1,0,2,2,-1,-1]],"dim":[null,[-1,0,1,2,1,-1]]};
+const ABIERTOS = {C:[-1,3,2,0,1,0],D:[-1,-1,0,2,3,2],E:[0,2,2,1,0,0],G:[3,2,0,0,0,3],A:[-1,0,2,2,2,0],Am:[-1,0,2,2,1,0],Em:[0,2,2,0,0,0],Dm:[-1,-1,0,2,3,1],A7:[-1,0,2,0,2,0],E7:[0,2,0,1,0,0],D7:[-1,-1,0,2,1,2],G7:[3,2,0,0,0,1],C7:[-1,3,2,3,1,0],B7:[-1,2,1,2,0,2],Cmaj7:[-1,3,2,0,0,0],Fmaj7:[-1,-1,3,2,1,0],Am7:[-1,0,2,0,1,0],Em7:[0,2,0,0,0,0],Dmaj7:[-1,-1,0,2,2,2],Asus2:[-1,0,2,2,0,0],Asus4:[-1,0,2,2,3,0],Dsus4:[-1,-1,0,2,3,3],Dsus2:[-1,-1,0,2,3,0],Esus4:[0,2,2,2,0,0]};
+const DIF = {raiz:9, tipo:"", modo:"acorde"};
+function acorde(r, tipo){
+  const k = LET[r] + tipo; if (ABIERTOS[k]) return {f:ABIERTOS[k], base:0};
+  const sh = FORMAS[tipo], c = []; if (!sh) return null;
+  if (sh[0]) c.push([(r + 8) % 12, sh[0]]);                 // forma de Mi (raíz en la 6ª cuerda)
+  if (sh[1]) c.push([(r + 3) % 12, sh[1]]);                 // forma de La (raíz en la 5ª cuerda)
+  if (!c.length) return null; c.sort((a, b) => a[0] - b[0]);
+  const [base, f] = c[0]; return {f:f.map(x => x < 0 ? -1 : x + base), base};
+}
+function dedosAc(a){
+  const idx = []; a.f.forEach((f, i) => { if (f > 0) idx.push([f, i]); }); idx.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+  const d = Array(6).fill(0); let n = a.base > 0 ? 2 : 1;
+  idx.forEach(([f, i]) => { d[i] = (a.base > 0 && f === a.base) ? 1 : Math.min(4, n++); }); return d;
+}
+function dibujarAcorde(a){
+  const cv = $("dCh"), c = cv.getContext("2d"), d = devicePixelRatio || 1, W = 220, H = 250;
+  cv.width = W * d; cv.height = H * d; cv.style.width = W + "px"; cv.style.height = H + "px"; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
+  c.textAlign = "center"; c.textBaseline = "middle"; c.font = "600 14px Segoe UI, system-ui, sans-serif";
+  if (!a){ c.fillStyle = "#8da3b8"; c.fillText("Esta forma no existe para este acorde", W / 2, H / 2); return; }
+  const x0 = 40, dx = 28, y0 = 50, dy = 36, ini = a.base > 1 ? a.base : 1, dd = dedosAc(a);
+  for (let s = 0; s < 6; s++){ const x = x0 + s * dx; c.fillStyle = "#cfe0f0"; if (a.f[s] < 0) c.fillText("×", x, 30); else if (a.f[s] === 0){ c.strokeStyle = "#cfe0f0"; c.lineWidth = 2; c.beginPath(); c.arc(x, 30, 6, 0, 6.3); c.stroke(); } }
+  c.strokeStyle = "#4b6178";
+  for (let r = 0; r <= 5; r++){ c.lineWidth = (r === 0 && ini === 1) ? 5 : 1.5; c.beginPath(); c.moveTo(x0, y0 + r * dy); c.lineTo(x0 + 5 * dx, y0 + r * dy); c.stroke(); }
+  c.lineWidth = 1.5; for (let s = 0; s < 6; s++){ c.beginPath(); c.moveTo(x0 + s * dx, y0); c.lineTo(x0 + s * dx, y0 + 5 * dy); c.stroke(); }
+  if (ini > 1){ c.fillStyle = "#ff9638"; c.textAlign = "right"; c.fillText("traste " + ini, x0 - 10, y0 - 22); c.textAlign = "center"; }
+  const bs = a.base > 0 ? a.f.map((f, i) => f === a.base ? i : -1).filter(i => i >= 0) : [];
+  if (bs.length > 1){ const y = y0 + (a.base - ini + .5) * dy; c.strokeStyle = "#ff9638"; c.lineWidth = 16; c.lineCap = "round"; c.beginPath(); c.moveTo(x0 + bs[0] * dx, y); c.lineTo(x0 + bs[bs.length - 1] * dx, y); c.stroke(); c.lineCap = "butt"; }
+  a.f.forEach((f, s) => {
+    if (f <= 0) return; const x = x0 + s * dx, y = y0 + (f - ini + .5) * dy, barre = bs.length > 1 && f === a.base;
+    if (barre && s !== bs[0]) return;
+    if (!barre){ c.fillStyle = RS[s]; c.beginPath(); c.arc(x, y, 11, 0, 6.3); c.fill(); }
+    c.fillStyle = "#0b1016"; c.fillText(String(dd[s]), x, y + 1);
+  });
+}
+function dibujarMastil(pcs, raiz){
+  const cv = $("dNeck"), c = cv.getContext("2d"), d = devicePixelRatio || 1, r = cv.getBoundingClientRect(), W = r.width || 640, H = r.height || 210;
+  cv.width = W * d; cv.height = H * d; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
+  const L = 36, Wd = W - L - 10, top = 22, gap = (H - top - 34) / 5, N = 15, pf = f => 1 - Math.pow(2, -f / 12), wx = f => L + pf(f) / pf(N) * Wd;
+  c.fillStyle = "#1c1510"; c.fillRect(L, top - 10, Wd, gap * 5 + 20);
+  for (let f = 0; f <= N; f++){ c.strokeStyle = f === 0 ? "#d7dbe0" : "#6f7883"; c.lineWidth = f === 0 ? 5 : 1.5; c.beginPath(); c.moveTo(wx(f), top - 10); c.lineTo(wx(f), top + gap * 5 + 10); c.stroke(); }
+  c.textAlign = "center"; c.textBaseline = "middle";
+  for (let row = 0; row < 6; row++){
+    const y = top + row * gap; c.strokeStyle = RS[row]; c.lineWidth = Math.max(1.2, 3.2 - row * .45); c.beginPath(); c.moveTo(L, y); c.lineTo(L + Wd, y); c.stroke();
+    c.fillStyle = "#9fb3c6"; c.font = "12px Segoe UI, system-ui, sans-serif"; c.fillText(CUERDA_NOM[6 - row], 12, y);
+    for (let f = 0; f <= N; f++){
+      const pc = (AFIN[row] + f) % 12; if (!pcs.has(pc)) continue;
+      const x = f === 0 ? L - 12 : (wx(f - 1) + wx(f)) / 2;
+      c.fillStyle = pc === raiz ? "#ff9638" : "#36b9ff"; c.beginPath(); c.arc(x, y, 10, 0, 6.3); c.fill();
+      c.fillStyle = "#0b1016"; c.font = "700 9.5px Segoe UI, system-ui, sans-serif"; c.fillText(NOM[pc], x, y + 1);
+    }
+  }
+  c.fillStyle = "#6f7c8c"; c.font = "12px Segoe UI, system-ui, sans-serif";
+  for (const f of [3,5,7,9,12,15]) c.fillText(String(f), (wx(f - 1) + wx(f)) / 2, H - 10);
+}
+function difPintar(){
+  const r = DIF.raiz, a = acorde(r, DIF.tipo);
+  $("dTitulo").textContent = NOM[r] + DIF.tipo + " · " + TIPOS[DIF.tipo];
+  dibujarAcorde(a);
+  const pcs = DIF.modo === "acorde" ? new Set(a ? a.f.map((f, i) => f >= 0 ? (AFIN[i] + f) % 12 : -1).filter(x => x >= 0) : []) : new Set(ESC[DIF.modo].map(i => (r + i) % 12));
+  dibujarMastil(pcs, r);
+  $("dNotas").textContent = DIF.modo === "acorde" ? (a ? "Notas del acorde: " + [...new Set(a.f.map((f, i) => f >= 0 ? NOM[(AFIN[i] + f) % 12] : null).filter(Boolean))].join(" · ") : "") : "Notas de la escala: " + [...pcs].map(p => NOM[p]).join(" · ");
+  const dd = a ? dedosAc(a) : [];
+  $("dDedos").textContent = a ? "Cuerdas 6→1: " + a.f.map((f, i) => f < 0 ? "×" : f === 0 ? "0" : f + " (dedo " + dd[i] + ")").join("   ") + (a.base > 0 ? "\nCejilla con el índice en el traste " + a.base : "") : "";
+  $("dRaices").querySelectorAll("button").forEach(b => b.classList.toggle("on", +b.dataset.r === r));
+  $("dTipos").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.t === DIF.tipo));
+}
+function construirDif(){
+  const host = $("difHost"); if (!host) return;
+  host.innerHTML = `<div class="dif-bar"><label>Vista del mástil<select id="dModo"><option value="acorde">Notas del acorde</option><option value="mayor">Escala mayor</option><option value="menor">Escala menor natural</option><option value="pentm">Pentatónica menor</option><option value="pentM">Pentatónica mayor</option><option value="blues">Escala de blues</option><option value="todas">Todas las notas</option></select></label>
+    <button class="btn btn-secondary btn-small" id="dOir">🔊 Escuchar acorde</button><button class="btn btn-primary btn-small" id="dPrac">Practicar en la pista</button></div>
+    <p class="muted">1) Elige la nota raíz. 2) Elige el tipo de acorde. El diagrama muestra dónde poner cada dedo; el mástil de abajo marca esas mismas notas en toda la guitarra (naranja = raíz).</p>
+    <div class="chips" id="dRaices">${NOM.map((n, i) => `<button data-r="${i}">${n}</button>`).join("")}</div>
+    <div class="chips" id="dTipos">${Object.keys(TIPOS).map(t => `<button data-t="${t}">${TIPOS[t]}</button>`).join("")}</div>
+    <div class="dif-main"><div class="dif-card"><h3 id="dTitulo"></h3><canvas id="dCh"></canvas><p id="dNotas" class="dif-txt"></p><p id="dDedos" class="dif-txt"></p></div><div class="dif-card wide"><canvas id="dNeck"></canvas></div></div>`;
+  host.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.r !== undefined) DIF.raiz = +b.dataset.r; else if (b.dataset.t !== undefined) DIF.tipo = b.dataset.t; else return; difPintar();
+  });
+  $("dModo").onchange = e => { DIF.modo = e.target.value; difPintar(); };
+  $("dOir").onclick = () => { const a = acorde(DIF.raiz, DIF.tipo); if (!a) return; S.ctx = S.ctx || new (window.AudioContext || window.webkitAudioContext)(); S.ctx.resume(); a.f.forEach((f, i) => { if (f >= 0) setTimeout(() => pluck(AFIN[i] + f, 1200), i * 45); }); };
+  $("dPrac").onclick = () => {
+    const a = acorde(DIF.raiz, DIF.tipo); if (!a) return; const tok = a.f.map((f, i) => f >= 0 ? `${6 - i}.${f}` : null).filter(Boolean).join("+");
+    const c = {id:"dif", grupo:"Diapasón", nombre:"Acorde " + NOM[DIF.raiz] + DIF.tipo, bpm:60, tab:R(tok + ":2", 4)}, k = CAN.findIndex(x => x.id === "dif");
+    if (k >= 0) CAN[k] = c; else { CAN.push(c); $("pSong").insertAdjacentHTML("beforeend", `<optgroup label="Diapasón"><option value="dif"></option></optgroup>`); }
+    $("pSong").querySelector('option[value="dif"]').textContent = c.nombre; cargar("dif"); ponerModo(1); ver("pista");
+  };
+  if (window.ResizeObserver) new ResizeObserver(() => difPintar()).observe($("dNeck"));
+  difPintar();
+}
+
 /* ================= PARSEO ================= */
-const mk = (ini, dur, c, f) => ({ini, dur:Math.max(dur,240), midi:ABIERTA[c] + f, fret:f, traste:f, carril:c - 1, cuerda:c, dedo:null, real:false, gid:ini});
+const mk = (ini, dur, c, f, bend = 0) => ({bend, ini, dur:Math.max(dur,240), midi:ABIERTA[c] + f + bend, fret:f, traste:f, carril:c - 1, cuerda:c, dedo:null, real:false, gid:ini});
 function cerrar(notas, total, nombre, carriles, tempos){
   notas.sort((a, b) => a.ini - b.ini);
   const num = t => typeof t === "number" && t > 0;
@@ -81,7 +224,7 @@ function parseTab(tab, bpm, nombre){
   const notas = []; let t = 0;
   for (const tok of tab.trim().split(/\s+/)){
     const [a, d] = tok.split(":"), dur = Math.round((+d || 1) * 960);
-    if (a !== "r") for (const p of a.split("+")){ const [c, f] = p.split(".").map(Number); notas.push(mk(t, dur, c, f)); }
+    if (a !== "r") for (const p of a.split("+")){ const m = /^(\d)\.(\d+)(?:b(\d))?$/.exec(p); notas.push(mk(t, dur, +m[1], +m[2], +(m[3] || 0))); }
     t += dur;
   }
   return cerrar(notas, t, nombre, 6, [[0, bpm]]);
@@ -148,7 +291,7 @@ class Pista{
       const w = (abierta ? Wd : Math.max(sw * .82, 22)) * s0, hh = Math.min(gap * .74, 28) * s0, pp = P(xc, y, t0);
       c.fillStyle = miss ? "#59616b" : col; c.beginPath(); rr(c, pp[0] - w / 2, pp[1] - hh / 2, w, hh, 4 * s0); c.fill();
       if (hit && n.ini <= tick + 400 || activa){ c.strokeStyle = hit ? "#3fe08f" : "#fff"; c.lineWidth = 3; c.stroke(); }
-      c.font = "700 " + Math.max(9, Math.round(hh * .64)) + "px Segoe UI, system-ui, sans-serif"; c.fillStyle = "#0b1016"; c.fillText(String(n.traste), pp[0], pp[1] + 1);
+      c.font = "700 " + Math.max(9, Math.round(hh * .64)) + "px Segoe UI, system-ui, sans-serif"; c.fillStyle = "#0b1016"; c.fillText(n.traste + (n.bend ? "↑" : ""), pp[0], pp[1] + 1);
       if (n.dedo >= 1 && s0 > .5){ const bx = pp[0] + (abierta ? 0 : w / 2) - 2, by = pp[1] - hh / 2 - 2; c.fillStyle = "#0b1016"; c.beginPath(); c.arc(bx, by, 8 * s0, 0, 6.3); c.fill(); c.fillStyle = "#fff"; c.font = "700 " + Math.round(11 * s0) + "px Segoe UI, system-ui, sans-serif"; c.fillText(String(n.dedo), bx, by + 1); }
       c.globalAlpha = 1;
     }
@@ -215,7 +358,7 @@ function hud(J, obj){
   $("pd" + i).textContent = J.det !== null ? nom(Math.round(J.det)) : "—";
   $("po" + i).textContent = obj.length ? [...new Set(obj.map(n => nom(n.midi)))].join(" + ") : "—";
   $("pp" + i).textContent = J.pts; $("pr" + i).textContent = J.racha; $("pa" + i).textContent = t ? Math.round(J.ac / t * 100) + "%" : "—";
-  $("pf" + i).textContent = obj.map(n => `Cuerda ${n.cuerda}${S.cancion.carriles === 6 ? " (" + CUERDA_NOM[n.cuerda] + ")" : ""} · Traste ${n.traste === 0 ? "0 (al aire)" : n.traste} · Dedo ${DEDO[n.dedo] || "silenciada"}`).join("   |   ");
+  $("pf" + i).textContent = obj.map(n => `Cuerda ${n.cuerda}${S.cancion.carriles === 6 ? " (" + CUERDA_NOM[n.cuerda] + ")" : ""} · Traste ${n.traste === 0 ? "0 (al aire)" : n.traste}${n.bend ? " con bend de " + (n.bend === 1 ? "medio tono" : n.bend / 2 + " tono") : ""} · Dedo ${DEDO[n.dedo] || "silenciada"}`).join("   |   ");
 }
 function bucle(now){
   S.raf = requestAnimationFrame(bucle);
@@ -285,9 +428,9 @@ function pintarCurso(){
     m.l.map((l, li) => `<article class="lec"><div><h4>${prog[mi + "." + li] ? "✓ " : ""}${l.t}</h4><p>${l.x}</p><span class="tag">${l.b} BPM</span>${prog[mi + "." + li] ? `<span class="tag ok">Mejor: ${prog[mi + "." + li]}%</span>` : ""}</div><button class="btn btn-primary btn-small" data-play="c:${mi}.${li}">Practicar →</button></article>`).join("") + "</details>").join("");
 }
 function pintarRock(){
-  const est = $("rockFiltro").value;
-  $("rockLista").innerHTML = ROCK.map((r, i) => ({r, i})).filter(x => !est || x.r[1] === est).map(({r, i}) =>
-    `<article class="lec"><div><h4>${r[0]}</h4><span class="tag">${r[1]}</span><span class="tag">${"★".repeat(r[2])}${"☆".repeat(3 - r[2])}</span><span class="tag">${r[3]} BPM</span></div><div class="acc"><button class="btn btn-primary btn-small" data-play="r:${i}">Tocar</button><button class="btn btn-secondary btn-small" data-duo="r:${i}">Duelo 1 vs 1</button></div></article>`).join("");
+  const est = $("rockFiltro").value, ban = $("rockBanda").value;
+  $("rockLista").innerHTML = ROCK.map((r, i) => ({r, i})).filter(x => (!est || x.r[1] === est) && (!ban || x.r[5] === ban)).map(({r, i}) =>
+    `<article class="lec"><div><h4>${r[0]}</h4><span class="tag">${r[1]}</span><span class="tag">${"★".repeat(r[2])}${"☆".repeat(3 - r[2])}</span><span class="tag">${r[3]} BPM</span>${r[5] ? `<span class="tag">Estilo ${r[5]}</span>` : ""}</div><div class="acc"><button class="btn btn-primary btn-small" data-play="r:${i}">Tocar</button><button class="btn btn-secondary btn-small" data-duo="r:${i}">Duelo 1 vs 1</button></div></article>`).join("");
 }
 function construirUI(){
   const jugador = i => `<div class="pj" id="pj${i}"><div class="pj-top"><b>${i === 1 ? "Jugador 1" : "Jugador 2"}</b><select id="pDev${i}"><option value="">Predeterminado</option></select><select id="pCh${i}"><option value="0">Mono / mezcla</option><option value="1">Canal 1 (izq.)</option><option value="2">Canal 2 (der.)</option></select></div>
@@ -295,12 +438,12 @@ function construirUI(){
   const estilos = [...new Set(ROCK.map(r => r[1]))];
   const grupos = [...new Set(CAN.map(c => c.grupo))].map(g => `<optgroup label="${g}">${CAN.filter(c => c.grupo === g).map(c => `<option value="${c.id}">${c.nombre}</option>`).join("")}</optgroup>`).join("");
   $("view-lessons").insertAdjacentHTML("afterend", `
-  <section id="view-escuela" class="view"><div class="page-heading"><div><p class="eyebrow">ESCUELA GUITAR MASTER</p><h1>Curso <span>práctico</span> de guitarra</h1><p class="lead">6 módulos, 18 lecciones: de las cuerdas al aire a solos de rock. Cada lección se practica en la pista, con puntaje; con 70% de precisión se completa.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
+  <section id="view-escuela" class="view"><div class="page-heading"><div><p class="eyebrow">ESCUELA GUITAR MASTER</p><h1>Curso <span>práctico</span> de guitarra</h1><p class="lead">${CURSO.length} módulos, ${CURSO.reduce((s, m) => s + m.l.length, 0)} lecciones: de las cuerdas al aire a solos de rock. Cada lección se practica en la pista, con puntaje; con 70% de precisión se completa.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
     <div class="progress-track"><span id="cursoBarra"></span></div><p class="muted" id="cursoProg"></p><div id="cursoLista"></div></section>
-  <section id="view-rock" class="view"><div class="page-heading"><div><p class="eyebrow">BIBLIOTECA</p><h1>Rock <span>en la pista</span></h1><p class="lead">Riffs originales por estilo y nivel. Para tus canciones favoritas, abre tu propio archivo Guitar Pro en la pista.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
-    <div class="inline-actions"><select id="rockFiltro"><option value="">Todos los estilos</option>${estilos.map(e => `<option>${e}</option>`).join("")}</select></div><div id="rockLista"></div></section>
+  <section id="view-rock" class="view"><div class="page-heading"><div><p class="eyebrow">BIBLIOTECA</p><h1>Rock <span>en la pista</span></h1><p class="lead">Riffs originales por estilo y nivel, algunos «al estilo de» grandes bandas del rock. No copian sus canciones: para un tema exacto, abre tu propio archivo Guitar Pro en la pista.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
+    <div class="inline-actions"><select id="rockFiltro"><option value="">Todos los estilos</option>${estilos.map(e => `<option>${e}</option>`).join("")}</select><select id="rockBanda"><option value="">Todas las bandas de referencia</option>${[...new Set(ROCK.map(r => r[5]).filter(Boolean))].map(b => `<option>${b}</option>`).join("")}</select></div><div id="rockLista"></div></section>
   <section id="view-pista" class="view"><div class="page-heading"><div><p class="eyebrow">PISTA ESTILO ROCKSMITH</p><h1>Toca <span>y puntúa</span></h1><p class="lead">Las notas bajan por el diapasón hasta su cuerda y traste. Hay una cuenta previa de 4 pulsos. Con dos jugadores, cada uno usa su propia entrada o canal.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
-    <div class="pj-bar"><select id="pSong">${grupos}</select><select id="pVel"><option value="0.5">50%</option><option value="0.7">70%</option><option value="0.85">85%</option><option value="1" selected>100%</option></select>
+    <div class="pj-bar"><select id="pSong">${grupos}</select><select id="pVel">${[.25,.3,.4,.5,.6,.7,.75,.8,.85,.9,.95,1,1.1,1.25].map(v => `<option value="${v}"${v === 1 ? " selected" : ""}>${Math.round(v * 100)}%</option>`).join("")}</select>
       <select id="pModo"><option value="1">1 jugador</option><option value="2">2 jugadores</option></select>
       <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label>
       <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><label class="btn btn-secondary btn-small" for="pGP">Abrir Guitar Pro</label><input type="file" id="pGP" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
@@ -317,7 +460,7 @@ function construirUI(){
   $("pSong").onchange = e => cargar(e.target.value);
   $("pModo").onchange = e => ponerModo(+e.target.value);
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
-  $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock;
+  $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
   $("pGP").onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
     try{ S.cancion = desdeGP(new Uint8Array(await f.arrayBuffer()), f.name); S.id = "gp"; reiniciar(); $("pRes").textContent = "Cargado: " + S.cancion.nombre; }
@@ -325,7 +468,7 @@ function construirUI(){
   };
   window.addEventListener("resize", () => S.todos.forEach(J => J.pista.resize()));
   const duelo = $("goDuelo"); if (duelo) duelo.onclick = () => { cargar(S.id || "r:3"); ponerModo(2); ver("pista"); };
-  pintarCurso(); pintarRock(); cargar("c:0.0"); ponerModo(1);
+  pintarCurso(); pintarRock(); cargar("c:0.0"); ponerModo(1); construirDif();
   S.ult = performance.now(); S.raf = requestAnimationFrame(bucle);
 }
 construirUI();

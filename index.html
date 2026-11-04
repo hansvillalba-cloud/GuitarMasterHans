@@ -46,8 +46,8 @@
         <div class="module-grid">
           <button class="module-card" data-go="tuner"><span class="module-icon blue">♩</span><strong>Afinador inteligente</strong><small>Afina las seis cuerdas con el micrófono o interfaz USB.</small><b>ABRIR MÓDULO ↗</b></button>
           <button class="module-card" data-go="practice"><span class="module-icon orange">♫</span><strong>Modo práctica</strong><small>Lee la nota objetivo, tócala y recibe retroalimentación.</small><b>EMPEZAR ↗</b></button>
-          <button class="module-card" data-go="fretboard"><span class="module-icon blue">▤</span><strong>Diapasón</strong><small>Explora notas en las seis cuerdas y aprende sus posiciones.</small><b>EXPLORAR ↗</b></button>
-          <button class="module-card" data-go="escuela"><span class="module-icon orange">✦</span><strong>Curso práctico</strong><small>6 módulos y 18 lecciones con puntaje, de cero a solos de rock.</small><b>APRENDER ↗</b></button>
+          <button class="module-card" data-go="fretboard"><span class="module-icon blue">▤</span><strong>Diapasón</strong><small>Diagramas de 9 tipos de acorde en los 12 tonos, escalas y notas del mástil.</small><b>EXPLORAR ↗</b></button>
+          <button class="module-card" data-go="escuela"><span class="module-icon orange">✦</span><strong>Curso práctico</strong><small>10 módulos y 37 lecciones con puntaje: acordes, cejilla, bends y solos.</small><b>APRENDER ↗</b></button>
           <button class="module-card" data-go="pista"><span class="module-icon blue">▤</span><strong>Pista estilo Rocksmith</strong><small>Diapasón en perspectiva: cuerda, traste y dedo en cada nota.</small><b>TOCAR ↗</b></button>
           <button class="module-card" data-go="rock"><span class="module-icon orange">♬</span><strong>Biblioteca de rock</strong><small>Riffs por estilo: blues, hard rock, punk, metal, grunge y más.</small><b>EXPLORAR ↗</b></button>
           <button class="module-card" id="goDuelo"><span class="module-icon orange">Ⅱ</span><strong>Modo dos jugadores</strong><small>Duelo en la pista: cada músico con su entrada y su puntaje.</small><b>JUGAR EN DÚO ↗</b></button>
@@ -108,8 +108,8 @@
       </section>
 
       <section id="view-fretboard" class="view">
-        <div class="page-heading"><div><p class="eyebrow">TEORÍA VISUAL</p><h1>Explora el <span>diapasón</span></h1><p class="lead">Selecciona una cuerda y un traste para descubrir la nota.</p></div><button class="btn btn-secondary" data-go="home">← Inicio</button></div>
-        <div class="panel fretboard-panel"><div class="fretboard-controls"><label>Vista<select id="fretView"><option value="notes">Notas musicales</option><option value="numbers">Grados desde Mi</option></select></label><span class="muted">Afinación estándar · E A D G B E</span></div><div id="fretboard" class="fretboard"></div><div class="note-explain" id="fretExplain">Selecciona una posición del diapasón.</div></div>
+        <div class="page-heading"><div><p class="eyebrow">TEORÍA VISUAL</p><h1>Diapasón, <span>notas y acordes</span></h1><p class="lead">Elige una nota y un tipo de acorde: verás dónde va cada dedo y todas sus notas en el mástil. También puedes ver escalas.</p></div><button class="btn btn-secondary" data-go="home">← Inicio</button></div>
+        <div id="difHost"></div><div class="panel fretboard-panel" style="display:none"><div class="fretboard-controls"><label>Vista<select id="fretView"><option value="notes">Notas musicales</option><option value="numbers">Grados desde Mi</option></select></label><span class="muted">Afinación estándar · E A D G B E</span></div><div id="fretboard" class="fretboard"></div><div class="note-explain" id="fretExplain">Selecciona una posición del diapasón.</div></div>
       </section>
 
       <section id="view-duo" class="view">

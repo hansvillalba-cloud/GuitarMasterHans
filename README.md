@@ -1,4 +1,14 @@
-# Guitar Master AI V1.5
+# Guitar Master AI V1.6
+
+## Novedades de V1.6
+
+- **Diapasón y acordes:** 9 tipos de acorde en los 12 tonos con diagrama y dedos sugeridos, mástil con las notas del acorde o de 6 escalas, botón para escucharlo y para practicarlo en la pista.
+- **Curso ampliado a 10 módulos y 37 lecciones:** 6 melodías más (La cucaracha, Estrellita, Fray Jacobo, Para Elisa, Noche de paz y una original 8-bit), acordes abiertos, cejilla móvil, bends, slides, vibrato, legato y tres solos largos.
+- **Biblioteca de rock con 29 riffs originales**, 13 de ellos «al estilo de» bandas de referencia (con filtro por banda). No copian canciones; los temas exactos se cargan con Guitar Pro.
+- **Velocidad del 25 % al 125 %** y logo renovado.
+- Tablatura compacta: `2.8b2` = traste 8 con bend de 2 semitonos.
+
+## V1.5
 
 ## Novedades de V1.5 (archivo `escuela.js`)
 
