@@ -477,7 +477,7 @@ function construirUI(){
     <div class="pj-bar"><select id="pSong">${grupos}</select><select id="pVel">${[.25,.3,.4,.5,.6,.7,.75,.8,.85,.9,.95,1,1.1,1.25].map(v => `<option value="${v}"${v === 1 ? " selected" : ""}>${Math.round(v * 100)}%</option>`).join("")}</select>
       <select id="pModo"><option value="1">1 jugador</option><option value="2">2 jugadores</option></select>
       <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label><label><input type="checkbox" id="pNom"> Nombres de nota</label>
-      <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><label class="btn btn-secondary btn-small" for="pGP">Abrir Guitar Pro</label><input type="file" id="pGP" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
+      <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><label class="btn btn-secondary btn-small" for="pGP">Abrir Guitar Pro</label><input type="file" id="pGP" hidden>
       <button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
     <p class="pj-res" id="pRes"></p><div class="pj-grid p1" id="pPlayers">${jugador(1)}${jugador(2)}</div>
     <p class="muted">Dos jugadores: usa dos interfaces, o una estéreo con canal 1 para uno y canal 2 para el otro. Con audífonos la guía no entra en el micrófono.</p></section>`);
@@ -493,7 +493,8 @@ function construirUI(){
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
   $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
   $("pGP").onchange = async e => {
-    const f = e.target.files[0]; if (!f) return;
+    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+    if (!/\.(gp|gp3|gp4|gp5|gpx)$/i.test(f.name)){ toast("«" + f.name + "» no es Guitar Pro (.gp, .gp3, .gp4, .gp5 o .gpx)"); return; }
     try{ S.cancion = desdeGP(new Uint8Array(await f.arrayBuffer()), f.name); S.id = "gp"; reiniciar(); $("pRes").textContent = "Cargado: " + S.cancion.nombre; }
     catch (err){ toast("No se pudo leer el archivo Guitar Pro: " + err.message); }
   };

@@ -1,4 +1,10 @@
-# Guitar Master AI V1.7
+# Guitar Master AI V1.7.1
+
+## V1.7.1
+
+- **Carga de archivos en el celular:** se quitó el filtro de extensiones de los selectores. Android e iOS atenuaban los `.gp3`/`.gp4`/`.gp5` porque no los reconocen; ahora se pueden elegir y la app valida la extensión al leerlos.
+
+## V1.7
 
 ## Novedades de V1.7
 
