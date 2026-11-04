@@ -104,6 +104,20 @@ ROCK.push(
  ["Blues metal lento en Mi","Hard rock",2,75,"6.0+5.2:2 6.3+5.5:1 6.0+5.2:1 6.5+5.7:2 6.3+5.5:1 6.0+5.2:1 3.0:.5 3.2:.5 2.0:.5 2.3:.5 1.0:2","Whitesnake"]
 );
 
+
+/* ---- módulo de las notas musicales y lecciones más largas ---- */
+const UPDOWN = (a, d = 1) => a.map(t => t + ":" + d).join(" ") + " " + [...a].reverse().slice(1).map(t => t + ":" + d).join(" ");
+CURSO.forEach((m, i) => { m.k = i; });                       // clave fija: el progreso guardado no cambia
+CURSO.unshift({k:"n", n:"0 · Las notas musicales", d:"Aprende los nombres Do, Re, Mi, Fa, Sol, La, Si en el mástil.", l:[
+  {t:"Las 7 notas: Do Re Mi Fa Sol La Si", b:60, x:"Las notas se llaman Do, Re, Mi, Fa, Sol, La, Si y luego vuelve a empezar. Toca de abajo hacia arriba diciendo cada nombre en voz alta: la pista lo muestra en «Pide».", tab:UPDOWN(["5.3","4.0","4.2","4.3","3.0","3.2","2.0","2.1"])},
+  {t:"Notas en la cuerda 1 (Mi aguda)", b:60, x:"Mi, Fa, Sol, La, Si, Do, Re, Mi. Entre Mi–Fa y Si–Do hay un solo traste; en las demás, dos. Es la regla que ordena todo el mástil.", tab:UPDOWN(["1.0","1.1","1.3","1.5","1.7","1.8","1.10","1.12"])},
+  {t:"Notas en la cuerda 5 (La)", b:60, x:"La, Si, Do, Re, Mi, Fa, Sol, La. Misma regla en otra cuerda: así se aprende dónde está cada nota.", tab:UPDOWN(["5.0","5.2","5.3","5.5","5.7","5.8","5.10","5.12"])},
+  {t:"Notas en la cuerda 6 (Mi grave)", b:60, x:"Mi, Fa, Sol, La, Si, Do, Re, Mi con las notas graves. Memoriza la cuerda 6: de ahí salen los acordes con cejilla.", tab:UPDOWN(["6.0","6.1","6.3","6.5","6.7","6.8","6.10","6.12"])},
+  {t:"Sostenidos: las 12 notas", b:70, x:"Entre casi todas las notas hay otra intermedia (sostenido #). Un traste = medio tono: Mi, Fa, Fa#, Sol, Sol#, La, La#, Si, Do, Do#, Re, Re#, Mi.", tab:UPDOWN(Array.from({length:13}, (_, i) => "6." + i), .5)},
+  {t:"Do mayor en dos octavas", b:70, x:"Junta todo: Do Re Mi Fa Sol La Si Do Re Mi Fa Sol La Si Do, subiendo y bajando por las seis cuerdas.", tab:UPDOWN(["5.3","4.0","4.2","4.3","3.0","3.2","2.0","2.1","2.3","1.0","1.1","1.3","1.5","1.7","1.8"], .5)}]});
+const beatsTab = t => t.trim().split(/\s+/).reduce((s, k) => s + (+k.split(":")[1] || 1), 0);
+CURSO.forEach(m => m.l.forEach(l => { const b = beatsTab(l.tab); if (b < 48) l.tab = R(l.tab, Math.min(8, Math.ceil(48 / b))); }));   // mínimo ≈ 48 pulsos
+
 /* ================= DIAPASÓN Y ACORDES ================= */
 const AFIN = [40,45,50,55,59,64];                          // cuerdas 6→1
 const LET = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
@@ -125,25 +139,39 @@ function dedosAc(a){
   const d = Array(6).fill(0); let n = a.base > 0 ? 2 : 1;
   idx.forEach(([f, i]) => { d[i] = (a.base > 0 && f === a.base) ? 1 : Math.min(4, n++); }); return d;
 }
-function dibujarAcorde(a){
-  const cv = $("dCh"), c = cv.getContext("2d"), d = devicePixelRatio || 1, W = 220, H = 250;
-  cv.width = W * d; cv.height = H * d; cv.style.width = W + "px"; cv.style.height = H + "px"; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, W, H);
+function dibujarDiag(cv, items, mudas, cw, ch, ns = 6){
+  const c = cv.getContext("2d"), d = devicePixelRatio || 1, W = 220, H = 250, k = cw / W;
+  cv.width = cw * d; cv.height = ch * d; cv.style.width = cw + "px"; cv.style.height = ch + "px"; c.setTransform(d * k, 0, 0, d * k, 0, 0); c.clearRect(0, 0, W, ch / k);
   c.textAlign = "center"; c.textBaseline = "middle"; c.font = "600 14px Segoe UI, system-ui, sans-serif";
-  if (!a){ c.fillStyle = "#8da3b8"; c.fillText("Esta forma no existe para este acorde", W / 2, H / 2); return; }
-  const x0 = 40, dx = 28, y0 = 50, dy = 36, ini = a.base > 1 ? a.base : 1, dd = dedosAc(a);
-  for (let s = 0; s < 6; s++){ const x = x0 + s * dx; c.fillStyle = "#cfe0f0"; if (a.f[s] < 0) c.fillText("×", x, 30); else if (a.f[s] === 0){ c.strokeStyle = "#cfe0f0"; c.lineWidth = 2; c.beginPath(); c.arc(x, 30, 6, 0, 6.3); c.stroke(); } }
+  if (!items.length){ c.fillStyle = "#8da3b8"; c.fillText("Sin notas", W / 2, H / 2); return; }
+  const x0 = 40, dx = 140 / (ns - 1), y0 = 50, dy = 36, fr = items.filter(i => i.f > 0).map(i => i.f);
+  let ini = fr.length && Math.min(...fr) > 1 ? Math.min(...fr) : 1; if (fr.length && Math.max(...fr) - ini > 4) ini = Math.max(...fr) - 4;
+  for (let s = 0; s < ns; s++){ const x = x0 + s * dx; c.fillStyle = "#cfe0f0"; if (mudas.has(s)) c.fillText("×", x, 30); else if (items.some(i => i.s === s && i.f === 0)){ c.strokeStyle = "#cfe0f0"; c.lineWidth = 2; c.beginPath(); c.arc(x, 30, 6, 0, 6.3); c.stroke(); } }
   c.strokeStyle = "#4b6178";
-  for (let r = 0; r <= 5; r++){ c.lineWidth = (r === 0 && ini === 1) ? 5 : 1.5; c.beginPath(); c.moveTo(x0, y0 + r * dy); c.lineTo(x0 + 5 * dx, y0 + r * dy); c.stroke(); }
-  c.lineWidth = 1.5; for (let s = 0; s < 6; s++){ c.beginPath(); c.moveTo(x0 + s * dx, y0); c.lineTo(x0 + s * dx, y0 + 5 * dy); c.stroke(); }
-  if (ini > 1){ c.fillStyle = "#ff9638"; c.textAlign = "right"; c.fillText("traste " + ini, x0 - 10, y0 - 22); c.textAlign = "center"; }
-  const bs = a.base > 0 ? a.f.map((f, i) => f === a.base ? i : -1).filter(i => i >= 0) : [];
-  if (bs.length > 1){ const y = y0 + (a.base - ini + .5) * dy; c.strokeStyle = "#ff9638"; c.lineWidth = 16; c.lineCap = "round"; c.beginPath(); c.moveTo(x0 + bs[0] * dx, y); c.lineTo(x0 + bs[bs.length - 1] * dx, y); c.stroke(); c.lineCap = "butt"; }
-  a.f.forEach((f, s) => {
-    if (f <= 0) return; const x = x0 + s * dx, y = y0 + (f - ini + .5) * dy, barre = bs.length > 1 && f === a.base;
-    if (barre && s !== bs[0]) return;
-    if (!barre){ c.fillStyle = RS[s]; c.beginPath(); c.arc(x, y, 11, 0, 6.3); c.fill(); }
-    c.fillStyle = "#0b1016"; c.fillText(String(dd[s]), x, y + 1);
+  for (let r = 0; r <= 5; r++){ c.lineWidth = (r === 0 && ini === 1) ? 5 : 1.5; c.beginPath(); c.moveTo(x0, y0 + r * dy); c.lineTo(x0 + (ns - 1) * dx, y0 + r * dy); c.stroke(); }
+  c.lineWidth = 1.5; for (let s = 0; s < ns; s++){ c.beginPath(); c.moveTo(x0 + s * dx, y0); c.lineTo(x0 + s * dx, y0 + 5 * dy); c.stroke(); }
+  if (ini > 1){ c.fillStyle = "#ff9638"; c.textAlign = "right"; c.fillText("traste " + ini, x0 + (ns - 1) * dx, y0 - 22); c.textAlign = "center"; }
+  const bar = new Set();                                    // cejilla: varias cuerdas con el dedo 1 en el mismo traste
+  Object.entries(items.filter(i => i.f > 0 && i.d === 1).reduce((m, i) => ((m[i.f] = m[i.f] || []).push(i.s), m), {})).forEach(([f, ss]) => {
+    if (ss.length < 2) return; ss.sort((p, q) => p - q); const y = y0 + (+f - ini + .5) * dy;
+    c.strokeStyle = "#ff9638"; c.lineWidth = 16; c.lineCap = "round"; c.beginPath(); c.moveTo(x0 + ss[0] * dx, y); c.lineTo(x0 + ss[ss.length - 1] * dx, y); c.stroke(); c.lineCap = "butt";
+    ss.forEach((s, j) => { if (j) bar.add(f + ":" + s); });
   });
+  items.forEach(i => {
+    if (i.f <= 0 || bar.has(i.f + ":" + i.s)) return; const x = x0 + i.s * dx, y = y0 + (i.f - ini + .5) * dy, barre = i.d === 1 && items.some(o => o !== i && o.f === i.f && o.d === 1);
+    if (!barre){ c.fillStyle = RS[i.s % 6]; c.beginPath(); c.arc(x, y, 11, 0, 6.3); c.fill(); }
+    c.fillStyle = "#0b1016"; c.fillText(i.d >= 1 ? String(i.d) : "", x, y + 1);
+  });
+}
+function dibujarAcorde(a){
+  const cv = $("dCh");
+  if (!a){ dibujarDiag(cv, [], new Set(), 220, 250); const c = cv.getContext("2d"); c.fillStyle = "#8da3b8"; c.textAlign = "center"; c.font = "600 13px Segoe UI, system-ui, sans-serif"; c.fillText("Esta forma no existe para este acorde", cv.width / (devicePixelRatio || 1) / 2, 125); return; }
+  const dd = dedosAc(a);
+  dibujarDiag(cv, a.f.map((f, s) => f >= 0 ? {s, f, d:dd[s]} : null).filter(Boolean), new Set(a.f.map((f, s) => f < 0 ? s : -1).filter(s => s >= 0)), 220, 250);
+}
+function diag(J, obj){
+  const key = obj.map(n => n.gid + "/" + n.cuerda + "/" + n.fret).join(); if (key === J.dk) return; J.dk = key;
+  const ns = S.cancion.carriles; dibujarDiag($("dg" + J.i), obj.map(n => ({s:ns - n.cuerda, f:n.fret, d:n.dedo})), new Set(), 150, 172, ns);
 }
 function dibujarMastil(pcs, raiz){
   const cv = $("dNeck"), c = cv.getContext("2d"), d = devicePixelRatio || 1, r = cv.getBoundingClientRect(), W = r.width || 640, H = r.height || 210;
@@ -253,7 +281,7 @@ const primero = (notas, tk) => { let lo = 0, hi = notas.length; while (lo < hi){
 const VEN = 7, ADE = 4800, K = 3.5, posF = f => 1 - Math.pow(2, -f / 12);
 function rr(c, x, y, w, h, r){ if (c.roundRect){ c.roundRect(x, y, w, h, r); return; } c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
 class Pista{
-  constructor(cv){ this.cv = cv; this.c = cv.getContext("2d"); this.s = {notas:[], lineas:[], carriles:6, grupos:new Map()}; this.f0 = 0; this.ok = false; this.tg = 0; this.resize(); if (window.ResizeObserver) new ResizeObserver(() => this.resize()).observe(cv); }
+  constructor(cv){ this.cv = cv; this.c = cv.getContext("2d"); this.s = {notas:[], lineas:[], carriles:6, grupos:new Map()}; this.f0 = 0; this.ok = false; this.tg = 0; this.nombres = false; this.resize(); if (window.ResizeObserver) new ResizeObserver(() => this.resize()).observe(cv); }
   set(s){ this.s = s; this.ok = false; }
   resize(){ const d = devicePixelRatio || 1, r = this.cv.getBoundingClientRect(); this.W = r.width; this.H = r.height; this.cv.width = r.width * d; this.cv.height = r.height * d; this.c.setTransform(d, 0, 0, d, 0, 0); }
   draw(tick, J){
@@ -288,10 +316,10 @@ class Pista{
       const activa = n.ini <= tick + 30 && tick <= fin, hit = J && J.hit.has(n.gid), miss = J && J.miss.has(n.gid);
       c.globalAlpha = miss ? .3 : hit && n.ini <= tick ? .45 : 1;
       if (!abierta && t1 - t0 > .04){ const tw = Math.min(sw * .12, 6), p1 = P(xc - tw, y, t0), p2 = P(xc + tw, y, t0), p3 = P(xc + tw, y, t1), p4 = P(xc - tw, y, t1); c.fillStyle = col + "88"; c.beginPath(); c.moveTo(p1[0], p1[1]); c.lineTo(p2[0], p2[1]); c.lineTo(p3[0], p3[1]); c.lineTo(p4[0], p4[1]); c.closePath(); c.fill(); }
-      const w = (abierta ? Wd : Math.max(sw * .82, 22)) * s0, hh = Math.min(gap * .74, 28) * s0, pp = P(xc, y, t0);
+      const w = (abierta ? Wd : Math.max(sw * .82, this.nombres ? 40 : 22)) * s0, hh = Math.min(gap * .74, 28) * s0, pp = P(xc, y, t0);
       c.fillStyle = miss ? "#59616b" : col; c.beginPath(); rr(c, pp[0] - w / 2, pp[1] - hh / 2, w, hh, 4 * s0); c.fill();
       if (hit && n.ini <= tick + 400 || activa){ c.strokeStyle = hit ? "#3fe08f" : "#fff"; c.lineWidth = 3; c.stroke(); }
-      c.font = "700 " + Math.max(9, Math.round(hh * .64)) + "px Segoe UI, system-ui, sans-serif"; c.fillStyle = "#0b1016"; c.fillText(n.traste + (n.bend ? "↑" : ""), pp[0], pp[1] + 1);
+      c.font = "700 " + Math.max(9, Math.round(hh * .64)) + "px Segoe UI, system-ui, sans-serif"; c.fillStyle = "#0b1016"; c.fillText(this.nombres ? NOM[((n.midi % 12) + 12) % 12] : n.traste + (n.bend ? "↑" : ""), pp[0], pp[1] + 1);
       if (n.dedo >= 1 && s0 > .5){ const bx = pp[0] + (abierta ? 0 : w / 2) - 2, by = pp[1] - hh / 2 - 2; c.fillStyle = "#0b1016"; c.beginPath(); c.arc(bx, by, 8 * s0, 0, 6.3); c.fill(); c.fillStyle = "#fff"; c.font = "700 " + Math.round(11 * s0) + "px Segoe UI, system-ui, sans-serif"; c.fillText(String(n.dedo), bx, by + 1); }
       c.globalAlpha = 1;
     }
@@ -313,7 +341,7 @@ function yin(b, sr){
 
 /* ================= SESIÓN DE JUEGO ================= */
 const CAN = [];                                   // todas las canciones disponibles
-CURSO.forEach((m, mi) => m.l.forEach((l, li) => CAN.push({id:`c:${mi}.${li}`, grupo:"Curso · " + m.n, nombre:l.t, bpm:l.b, tab:l.tab})));
+CURSO.forEach((m, mi) => m.l.forEach((l, li) => CAN.push({id:`c:${m.k}.${li}`, grupo:"Curso · " + m.n, nombre:l.t, bpm:l.b, tab:l.tab})));
 ROCK.forEach((r, i) => CAN.push({id:`r:${i}`, grupo:"Rock · " + r[1], nombre:r[0], bpm:r[3], tab:r[4]}));
 const S = {todos:[], cancion:null, id:"", jug:[], corriendo:false, tick:0, ult:0, vel:1, ctx:null, gi:0, beat:0, modo:1, raf:0};
 const prog = JSON.parse(localStorage.getItem("gm_curso") || "{}");
@@ -323,10 +351,12 @@ function cargar(id){
   const c = CAN.find(x => x.id === id); if (!c) return;
   S.id = id; S.cancion = parseTab(c.tab, c.bpm, c.nombre); reiniciar();
   if ($("pSong")) $("pSong").value = id;
+  if ($("pNom") && id.startsWith("c:n.")) $("pNom").checked = true;
+  if ($("pNom")) S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; });
 }
 function reiniciar(){
   S.corriendo = false; S.tick = -3840;
-  S.jug.forEach(J => { J.hit = new Set(); J.miss = new Set(); J.pts = 0; J.racha = 0; J.ac = 0; J.fa = 0; J.pista.set(S.cancion); });
+  S.jug.forEach(J => { J.dk = null; J.hit = new Set(); J.miss = new Set(); J.pts = 0; J.racha = 0; J.ac = 0; J.fa = 0; J.pista.set(S.cancion); });
   $("pStart").textContent = "▶ Jugar"; $("pRes").textContent = "";
 }
 function pluck(m, ms){
@@ -359,6 +389,7 @@ function hud(J, obj){
   $("po" + i).textContent = obj.length ? [...new Set(obj.map(n => nom(n.midi)))].join(" + ") : "—";
   $("pp" + i).textContent = J.pts; $("pr" + i).textContent = J.racha; $("pa" + i).textContent = t ? Math.round(J.ac / t * 100) + "%" : "—";
   $("pf" + i).textContent = obj.map(n => `Cuerda ${n.cuerda}${S.cancion.carriles === 6 ? " (" + CUERDA_NOM[n.cuerda] + ")" : ""} · Traste ${n.traste === 0 ? "0 (al aire)" : n.traste}${n.bend ? " con bend de " + (n.bend === 1 ? "medio tono" : n.bend / 2 + " tono") : ""} · Dedo ${DEDO[n.dedo] || "silenciada"}`).join("   |   ");
+  diag(J, obj);
 }
 function bucle(now){
   S.raf = requestAnimationFrame(bucle);
@@ -425,7 +456,7 @@ function pintarCurso(){
   $("cursoProg").textContent = `${hechas} de ${total} lecciones completadas (precisión mínima 70%)`;
   $("cursoBarra").style.width = Math.round(hechas / total * 100) + "%";
   $("cursoLista").innerHTML = CURSO.map((m, mi) => `<details class="mod" ${mi === 0 ? "open" : ""}><summary><b>${m.n}</b><small>${m.d}</small></summary>` +
-    m.l.map((l, li) => `<article class="lec"><div><h4>${prog[mi + "." + li] ? "✓ " : ""}${l.t}</h4><p>${l.x}</p><span class="tag">${l.b} BPM</span>${prog[mi + "." + li] ? `<span class="tag ok">Mejor: ${prog[mi + "." + li]}%</span>` : ""}</div><button class="btn btn-primary btn-small" data-play="c:${mi}.${li}">Practicar →</button></article>`).join("") + "</details>").join("");
+    m.l.map((l, li) => `<article class="lec"><div><h4>${prog[m.k + "." + li] ? "✓ " : ""}${l.t}</h4><p>${l.x}</p><span class="tag">${l.b} BPM</span>${prog[m.k + "." + li] ? `<span class="tag ok">Mejor: ${prog[m.k + "." + li]}%</span>` : ""}</div><button class="btn btn-primary btn-small" data-play="c:${m.k}.${li}">Practicar →</button></article>`).join("") + "</details>").join("");
 }
 function pintarRock(){
   const est = $("rockFiltro").value, ban = $("rockBanda").value;
@@ -434,7 +465,7 @@ function pintarRock(){
 }
 function construirUI(){
   const jugador = i => `<div class="pj" id="pj${i}"><div class="pj-top"><b>${i === 1 ? "Jugador 1" : "Jugador 2"}</b><select id="pDev${i}"><option value="">Predeterminado</option></select><select id="pCh${i}"><option value="0">Mono / mezcla</option><option value="1">Canal 1 (izq.)</option><option value="2">Canal 2 (der.)</option></select></div>
-    <canvas id="cv${i}"></canvas><div class="pj-hud"><div><small>Tocas</small><strong id="pd${i}">—</strong></div><div><small>Pide</small><strong id="po${i}">—</strong></div><div><small>Puntos</small><strong id="pp${i}">0</strong></div><div><small>Racha</small><strong id="pr${i}">0</strong></div><div><small>Precisión</small><strong id="pa${i}">—</strong></div></div><p class="pj-info" id="pf${i}"></p></div>`;
+    <canvas id="cv${i}"></canvas><div class="pj-hud"><div><small>Tocas</small><strong id="pd${i}">—</strong></div><div><small>Pide</small><strong id="po${i}">—</strong></div><div><small>Puntos</small><strong id="pp${i}">0</strong></div><div><small>Racha</small><strong id="pr${i}">0</strong></div><div><small>Precisión</small><strong id="pa${i}">—</strong></div></div><div class="pj-diag"><canvas id="dg${i}"></canvas><div><small>Posición de los dedos</small><p class="pj-info" id="pf${i}"></p></div></div></div>`;
   const estilos = [...new Set(ROCK.map(r => r[1]))];
   const grupos = [...new Set(CAN.map(c => c.grupo))].map(g => `<optgroup label="${g}">${CAN.filter(c => c.grupo === g).map(c => `<option value="${c.id}">${c.nombre}</option>`).join("")}</optgroup>`).join("");
   $("view-lessons").insertAdjacentHTML("afterend", `
@@ -445,7 +476,7 @@ function construirUI(){
   <section id="view-pista" class="view"><div class="page-heading"><div><p class="eyebrow">PISTA ESTILO ROCKSMITH</p><h1>Toca <span>y puntúa</span></h1><p class="lead">Las notas bajan por el diapasón hasta su cuerda y traste. Hay una cuenta previa de 4 pulsos. Con dos jugadores, cada uno usa su propia entrada o canal.</p></div><button class="btn btn-secondary" data-ir="home">← Inicio</button></div>
     <div class="pj-bar"><select id="pSong">${grupos}</select><select id="pVel">${[.25,.3,.4,.5,.6,.7,.75,.8,.85,.9,.95,1,1.1,1.25].map(v => `<option value="${v}"${v === 1 ? " selected" : ""}>${Math.round(v * 100)}%</option>`).join("")}</select>
       <select id="pModo"><option value="1">1 jugador</option><option value="2">2 jugadores</option></select>
-      <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label>
+      <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label><label><input type="checkbox" id="pNom"> Nombres de nota</label>
       <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><label class="btn btn-secondary btn-small" for="pGP">Abrir Guitar Pro</label><input type="file" id="pGP" accept=".gp,.gp3,.gp4,.gp5,.gpx" hidden>
       <button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
     <p class="pj-res" id="pRes"></p><div class="pj-grid p1" id="pPlayers">${jugador(1)}${jugador(2)}</div>
@@ -460,7 +491,7 @@ function construirUI(){
   $("pSong").onchange = e => cargar(e.target.value);
   $("pModo").onchange = e => ponerModo(+e.target.value);
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
-  $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
+  $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
   $("pGP").onchange = async e => {
     const f = e.target.files[0]; if (!f) return;
     try{ S.cancion = desdeGP(new Uint8Array(await f.arrayBuffer()), f.name); S.id = "gp"; reiniciar(); $("pRes").textContent = "Cargado: " + S.cancion.nombre; }
@@ -468,7 +499,7 @@ function construirUI(){
   };
   window.addEventListener("resize", () => S.todos.forEach(J => J.pista.resize()));
   const duelo = $("goDuelo"); if (duelo) duelo.onclick = () => { cargar(S.id || "r:3"); ponerModo(2); ver("pista"); };
-  pintarCurso(); pintarRock(); cargar("c:0.0"); ponerModo(1); construirDif();
+  pintarCurso(); pintarRock(); cargar("c:n.0"); ponerModo(1); construirDif();
   S.ult = performance.now(); S.raf = requestAnimationFrame(bucle);
 }
 construirUI();

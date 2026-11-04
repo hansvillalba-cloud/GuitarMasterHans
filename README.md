@@ -1,4 +1,12 @@
-# Guitar Master AI V1.6
+# Guitar Master AI V1.7
+
+## Novedades de V1.7
+
+- **Diagrama de dedos en la pista:** cada vez que llega una nota o acorde, un diagrama del mástil muestra qué dedo va en qué cuerda y traste.
+- **Módulo «Las notas musicales»:** 6 lecciones para aprender Do-Re-Mi-Fa-Sol-La-Si por cuerdas, los sostenidos y Do mayor en dos octavas. La casilla «Nombres de nota» cambia el traste por el nombre de la nota en la pista.
+- **Lecciones más largas:** todas duran al menos unos 48 pulsos. Ahora son 11 módulos y 43 lecciones.
+
+## V1.6
 
 ## Novedades de V1.6
 
