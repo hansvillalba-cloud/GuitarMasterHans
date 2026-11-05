@@ -257,9 +257,9 @@ function parseTab(tab, bpm, nombre){
   }
   return cerrar(notas, t, nombre, 6, [[0, bpm]]);
 }
-function desdeGP(bytes, nombre){
+function desdeGP(bytes, nombre, pista){
   const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(bytes, new alphaTab.Settings());
-  let idx = score.tracks.findIndex(t => t.playbackInfo && t.playbackInfo.program >= 24 && t.playbackInfo.program <= 31); if (idx < 0) idx = 0;
+  let idx = pista !== undefined ? pista : score.tracks.findIndex(t => !t.isPercussion && t.playbackInfo && t.playbackInfo.program >= 24 && t.playbackInfo.program <= 31); if (idx < 0) idx = score.tracks.findIndex(t => !t.isPercussion); if (idx < 0) idx = 0;
   const st = score.tracks[idx].staves[0], tun = st.tuning || (st.stringTuning && st.stringTuning.tunings) || [64,59,55,50,45,40], notas = [];
   for (const bar of st.bars) for (const beat of bar.voices[0].beats){
     if (beat.isRest) continue;
@@ -272,7 +272,9 @@ function desdeGP(bytes, nombre){
   }
   const tempos = []; let tp = score.tempo, total = 0;
   for (const mb of score.masterBars){ if (mb.tempoAutomation) tp = mb.tempoAutomation.value; tempos.push([mb.start, tp]); total = mb.start + mb.calculateDuration(); }
-  return cerrar(notas, total, (score.title || nombre) + " · " + score.tracks[idx].name, tun.length, tempos);
+  const s = cerrar(notas, total, (score.title || nombre) + " · " + score.tracks[idx].name, tun.length, tempos);
+  s.idx = idx; s.pistas = score.tracks.map((t, i) => ({i, n:(t.name || "Pista " + (i + 1)) + (t.isPercussion ? " (batería)" : "")}));
+  return s;
 }
 const tempoEn = (tempos, t) => { let v = tempos[0][1]; for (const [s, b] of tempos){ if (s <= t) v = b; else break; } return v; };
 const primero = (notas, tk) => { let lo = 0, hi = notas.length; while (lo < hi){ const m = (lo + hi) >> 1; if (notas[m].ini < tk) lo = m + 1; else hi = m; } return lo; };
@@ -343,19 +345,19 @@ function yin(b, sr){
 const CAN = [];                                   // todas las canciones disponibles
 CURSO.forEach((m, mi) => m.l.forEach((l, li) => CAN.push({id:`c:${m.k}.${li}`, grupo:"Curso · " + m.n, nombre:l.t, bpm:l.b, tab:l.tab})));
 ROCK.forEach((r, i) => CAN.push({id:`r:${i}`, grupo:"Rock · " + r[1], nombre:r[0], bpm:r[3], tab:r[4]}));
-const S = {todos:[], cancion:null, id:"", jug:[], corriendo:false, tick:0, ult:0, vel:1, ctx:null, gi:0, beat:0, modo:1, raf:0};
+const S = {aud:null, audIni:false, audioUrl:null, todos:[], cancion:null, id:"", jug:[], corriendo:false, tick:0, ult:0, vel:1, ctx:null, gi:0, beat:0, modo:1, raf:0};
 const prog = JSON.parse(localStorage.getItem("gm_curso") || "{}");
 const guardarProg = () => localStorage.setItem("gm_curso", JSON.stringify(prog));
 
 function cargar(id){
   const c = CAN.find(x => x.id === id); if (!c) return;
-  S.id = id; S.cancion = parseTab(c.tab, c.bpm, c.nombre); reiniciar();
+  limpiarAudio(); S.id = id; S.gp = null; S.cancion = parseTab(c.tab, c.bpm, c.nombre); reiniciar(); if ($("pTrack")) $("pTrack").style.display = "none";
   if ($("pSong")) $("pSong").value = id;
   if ($("pNom") && id.startsWith("c:n.")) $("pNom").checked = true;
   if ($("pNom")) S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; });
 }
 function reiniciar(){
-  S.corriendo = false; S.tick = -3840;
+  if (S.aud) S.aud.pause(); S.audIni = false; S.corriendo = false; S.tick = -3840;
   S.jug.forEach(J => { J.dk = null; J.hit = new Set(); J.miss = new Set(); J.pts = 0; J.racha = 0; J.ac = 0; J.fa = 0; J.pista.set(S.cancion); });
   $("pStart").textContent = "▶ Jugar"; $("pRes").textContent = "";
 }
@@ -399,13 +401,14 @@ function bucle(now){
       S.tick += dt * tempoEn(S.cancion.tempos, S.tick) * 960 / 60000 * S.vel;
       const b = Math.floor(S.tick / 960); if (b !== S.beat){ S.beat = b; if ($("pMet").checked) click(((b % 4) + 4) % 4 === 0); }
       const nt = S.cancion.notas; while (S.gi < nt.length && nt[S.gi].ini <= S.tick){ if ($("pGuia").checked) pluck(nt[S.gi].midi, nt[S.gi].dur * 60000 / (960 * tempoEn(S.cancion.tempos, S.tick))); S.gi++; }
+      if (S.tick >= 0 && S.audioUrl && !S.audIni && $("pAud").checked){ S.aud = S.aud || Object.assign(new Audio(S.audioUrl), {preservesPitch:true}); S.aud.currentTime = 0; S.aud.playbackRate = S.vel; S.aud.play().catch(() => {}); S.audIni = true; }
       if (S.tick > S.cancion.total + 480) terminar();
     }
     S.jug.forEach(J => { detectar(J, now); evaluar(J); hud(J, J.pista.draw(S.tick, J)); });
   } catch (e){ $("pRes").textContent = "Error: " + e.message; }
 }
 function terminar(){
-  S.corriendo = false; $("pStart").textContent = "▶ Jugar otra vez";
+  S.corriendo = false; if (S.aud) S.aud.pause(); $("pStart").textContent = "▶ Jugar otra vez";
   const r = S.jug.map(J => { const t = J.ac + J.fa; return {i:J.i, pts:J.pts, pre:t ? Math.round(J.ac / t * 100) : 0, mic:!!J.an}; });
   if (S.jug.length === 2){
     const [a, b] = r; $("pRes").textContent = !a.mic && !b.mic ? "Conecta los micrófonos para puntuar." : a.pts === b.pts ? `¡Empate! ${a.pts} puntos cada uno.` : `🏆 Gana el jugador ${a.pts > b.pts ? 1 : 2}: ${Math.max(a.pts, b.pts)} contra ${Math.min(a.pts, b.pts)} puntos (precisión ${a.pre}% y ${b.pre}%).`;
@@ -416,7 +419,7 @@ function terminar(){
   }
 }
 async function jugar(){
-  if (S.corriendo){ S.corriendo = false; $("pStart").textContent = "▶ Jugar"; return; }
+  if (S.corriendo){ S.corriendo = false; if (S.aud) S.aud.pause(); $("pStart").textContent = "▶ Jugar"; return; }
   S.ctx = S.ctx || new (window.AudioContext || window.webkitAudioContext)(); await S.ctx.resume();
   reiniciar(); S.vel = +$("pVel").value; S.gi = 0; S.beat = -5; S.corriendo = true; $("pStart").textContent = "■ Detener";
 }
@@ -445,10 +448,86 @@ function ponerModo(n){
   S.todos.forEach(J => J.pista.resize()); if (S.cancion) reiniciar();
 }
 
+
+/* ================= MIS TABLATURAS (misma base de datos que la Biblioteca) ================= */
+const DBN = "guitar-master-ai-library", DBS = "songs";
+const abrirDb = () => new Promise((ok, no) => { const q = indexedDB.open(DBN, 1); q.onupgradeneeded = () => { if (!q.result.objectStoreNames.contains(DBS)) q.result.createObjectStore(DBS, {keyPath:"id"}); }; q.onsuccess = () => ok(q.result); q.onerror = () => no(q.error); });
+const dbTodas = async () => { const db = await abrirDb(); return new Promise((ok, no) => { const r = db.transaction(DBS).objectStore(DBS).getAll(); r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error); }); };
+const dbGuardar = async rec => { const db = await abrirDb(); return new Promise((ok, no) => { const t = db.transaction(DBS, "readwrite"); t.objectStore(DBS).put(rec); t.oncomplete = ok; t.onerror = () => no(t.error); }); };
+let MIS = [];
+async function pintarMis(){
+  try{ MIS = (await dbTodas()).filter(r => /^gp[345x]?$/.test(r.ext)).sort((a, b) => a.name.localeCompare(b.name)); } catch (e){ MIS = []; }
+  const v = $("pMis").value;
+  $("pMis").innerHTML = `<option value="">Mis tablaturas (${MIS.length})</option>` + MIS.map(r => `<option value="${r.id}">${r.name.replace(/\.[^.]+$/, "")}</option>`).join(""); $("pMis").value = v;
+}
+function cargarGP(bytes, nombre, pista){
+  limpiarAudio(); S.gp = {bytes, nombre}; S.cancion = desdeGP(bytes, nombre, pista); S.id = "gp"; reiniciar();
+  $("pTrack").innerHTML = S.cancion.pistas.filter(p => !/batería/.test(p.n)).map(p => `<option value="${p.i}">${p.n}</option>`).join(""); $("pTrack").value = S.cancion.idx; $("pTrack").style.display = "";
+  $("pRes").textContent = "Cargado: " + S.cancion.nombre + " · elige otra pista (rítmica, solo, bajo…) en el selector.";
+}
+async function agregarGP(files){
+  let ult = null, n = 0; const ya = new Set(MIS.map(r => r.name + "|" + r.size));
+  for (const f of files){
+    if (!/\.(gp|gp3|gp4|gp5|gpx)$/i.test(f.name)){ toast("«" + f.name + "» no es Guitar Pro (.gp, .gp3, .gp4, .gp5 o .gpx)"); continue; }
+    if (ya.has(f.name + "|" + f.size)) continue;
+    try{
+      desdeGP(new Uint8Array(await f.arrayBuffer()), f.name);                               // comprueba que se pueda leer
+      const ext = f.name.split(".").pop().toLowerCase(), rec = {id:(crypto.randomUUID ? crypto.randomUUID() : Date.now() + "" + Math.random()), name:f.name, ext, type:"guitarpro", size:f.size, addedAt:Date.now(), blob:f};
+      await dbGuardar(rec); ult = rec; n++;
+    } catch (e){ toast("No se pudo leer " + f.name + ": " + e.message); }
+  }
+  await pintarMis(); if (n) toast(n === 1 ? "Agregada a Mis tablaturas" : n + " tablaturas agregadas a Mis tablaturas");
+  if (n === 1 && ult){ $("pMis").value = ult.id; cargarGP(new Uint8Array(await ult.blob.arrayBuffer()), ult.name); }
+}
+
+
+/* ================= MP3 → PISTA (experimental · Basic Pitch de Spotify, corre en tu navegador) ================= */
+const BP_ESM = ["https://esm.sh/@spotify/basic-pitch@1.0.1", "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm"];
+const BP_MODEL = "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json";
+let BPLIB = null;
+async function cargarBP(){ if (BPLIB) return BPLIB; let err; for (const u of BP_ESM){ try{ BPLIB = await import(u); return BPLIB; } catch (e){ err = e; } } throw err; }
+async function audioA22k(f){
+  const buf = await S.ctx.decodeAudioData(await f.arrayBuffer()), dur = Math.min(buf.duration, 240), off = new OfflineAudioContext(1, Math.ceil(dur * 22050), 22050), src = off.createBufferSource();
+  src.buffer = buf; src.connect(off.destination); src.start();
+  return {mono:(await off.startRendering()).getChannelData(0), dur, cortado:buf.duration > 240};
+}
+function mp3ASong(notasT, modo, nombre, dur){
+  const ns = notasT.filter(n => n.pitchMidi >= 40 && n.pitchMidi <= 83 && n.amplitude >= .25).map(n => ({t:n.startTimeSeconds, d:n.durationSeconds, m:n.pitchMidi})).sort((a, b) => a.t - b.t);
+  const grupos = []; for (const n of ns){ const g = grupos[grupos.length - 1]; if (g && n.t - g.t < .06) g.n.push(n); else grupos.push({t:n.t, n:[n]}); }
+  const out = []; let mano = 5;                                                   // mano = traste medio donde está la mano izquierda
+  for (const g of grupos){
+    const ord = g.n.sort((a, b) => b.m - a.m), sel = modo === "melodia" ? [ord[0]] : ord.slice(0, 4), usadas = new Set();
+    for (const n of sel){
+      let mejor = null;
+      for (let c = 1; c <= 6; c++){ const f = n.m - ABIERTA[c]; if (f < 0 || f > 19 || usadas.has(c)) continue; const costo = Math.abs(f - mano) + f * .05; if (!mejor || costo < mejor.costo) mejor = {c, f, costo}; }
+      if (!mejor) continue; usadas.add(mejor.c); if (mejor.f > 0) mano = mano * .6 + mejor.f * .4;
+      out.push(mk(Math.round(g.t * 1920), Math.max(240, Math.round(n.d * 1920)), mejor.c, mejor.f));
+    }
+  }
+  return cerrar(out, Math.round(dur * 1920), nombre, 6, [[0, 120]]);                // 120 BPM fijos = 1920 ticks por segundo de audio
+}
+function limpiarAudio(){ if (S.aud) S.aud.pause(); S.aud = null; S.audIni = false; if (S.audioUrl) URL.revokeObjectURL(S.audioUrl); S.audioUrl = null; }
+async function mp3APista(f){
+  const msg = t => { $("pRes").textContent = t; };
+  try{
+    S.ctx = S.ctx || new (window.AudioContext || window.webkitAudioContext)(); await S.ctx.resume();
+    msg("1/4 Cargando el modelo de IA (la primera vez descarga unos MB; necesita internet)…"); const L = await cargarBP();
+    msg("2/4 Leyendo el audio…"); const {mono, dur, cortado} = await audioA22k(f);
+    const bp = new L.BasicPitch(BP_MODEL), fr = [], on = [];
+    await bp.evaluateModel(mono, (a, b) => { for (const x of a) fr.push(x); for (const x of b) on.push(x); }, p => msg("3/4 Detectando notas… " + Math.round(p * 100) + "%"));
+    msg("4/4 Armando la pista…");
+    const s = mp3ASong(L.noteFramesToTime(L.outputToNotesPoly(fr, on, .5, .3, 5)), $("pMp3Modo").value, f.name.replace(/\.[^.]+$/, ""), dur);
+    if (!s.notas.length) throw new Error("no se detectaron notas de guitarra en el rango 'Mi grave a Re agudo'");
+    limpiarAudio(); S.gp = null; S.id = "mp3"; S.cancion = s; S.audioUrl = URL.createObjectURL(f); $("pGuia").checked = false; $("pTrack").style.display = "none"; reiniciar();
+    msg(`Borrador listo: ${s.notas.length} notas${cortado ? " (solo los primeros 4 minutos)" : ""}. Es una transcripción automática y puede tener errores; sonará el audio original. Usa audífonos.`);
+  } catch (err){ msg("No se pudo convertir el MP3: " + err.message); }
+}
+
 /* ================= INTERFAZ ================= */
 function ver(nombre){
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + nombre));
   window.scrollTo({top:0, behavior:"smooth"});
+  if (nombre === "pista") pintarMis();
   if (nombre === "pista") setTimeout(() => S.todos.forEach(J => J.pista.resize()), 30);
 }
 function pintarCurso(){
@@ -477,7 +556,7 @@ function construirUI(){
     <div class="pj-bar"><select id="pSong">${grupos}</select><select id="pVel">${[.25,.3,.4,.5,.6,.7,.75,.8,.85,.9,.95,1,1.1,1.25].map(v => `<option value="${v}"${v === 1 ? " selected" : ""}>${Math.round(v * 100)}%</option>`).join("")}</select>
       <select id="pModo"><option value="1">1 jugador</option><option value="2">2 jugadores</option></select>
       <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label><label><input type="checkbox" id="pNom"> Nombres de nota</label>
-      <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><label class="btn btn-secondary btn-small" for="pGP">Abrir Guitar Pro</label><input type="file" id="pGP" hidden>
+      <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><select id="pMis"><option value="">Mis tablaturas (0)</option></select><select id="pTrack" style="display:none" title="Pista del arreglo"></select><label class="btn btn-secondary btn-small" for="pGP">＋ Agregar tablaturas</label><input type="file" id="pGP" multiple hidden><select id="pMp3Modo" title="Qué notas extraer del MP3"><option value="melodia">MP3: melodía principal</option><option value="todas">MP3: todas las notas</option></select><label class="btn btn-secondary btn-small" for="pMp3">🎵 MP3 → pista</label><input type="file" id="pMp3" hidden><label><input type="checkbox" id="pAud" checked> Audio original</label>
       <button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
     <p class="pj-res" id="pRes"></p><div class="pj-grid p1" id="pPlayers">${jugador(1)}${jugador(2)}</div>
     <p class="muted">Dos jugadores: usa dos interfaces, o una estéreo con canal 1 para uno y canal 2 para el otro. Con audífonos la guía no entra en el micrófono.</p></section>`);
@@ -492,15 +571,13 @@ function construirUI(){
   $("pModo").onchange = e => ponerModo(+e.target.value);
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
   $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
-  $("pGP").onchange = async e => {
-    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
-    if (!/\.(gp|gp3|gp4|gp5|gpx)$/i.test(f.name)){ toast("«" + f.name + "» no es Guitar Pro (.gp, .gp3, .gp4, .gp5 o .gpx)"); return; }
-    try{ S.cancion = desdeGP(new Uint8Array(await f.arrayBuffer()), f.name); S.id = "gp"; reiniciar(); $("pRes").textContent = "Cargado: " + S.cancion.nombre; }
-    catch (err){ toast("No se pudo leer el archivo Guitar Pro: " + err.message); }
-  };
+  $("pGP").onchange = async e => { const fs = [...e.target.files]; e.target.value = ""; if (fs.length) await agregarGP(fs); };
+  $("pMp3").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (f) await mp3APista(f); };
+  $("pMis").onchange = async e => { const r = MIS.find(x => x.id === e.target.value); if (!r) return; try{ cargarGP(new Uint8Array(await r.blob.arrayBuffer()), r.name); } catch (err){ toast("No se pudo abrir " + r.name + ": " + err.message); } };
+  $("pTrack").onchange = e => { if (S.gp) try{ cargarGP(S.gp.bytes, S.gp.nombre, +e.target.value); } catch (err){ toast(err.message); } };
   window.addEventListener("resize", () => S.todos.forEach(J => J.pista.resize()));
   const duelo = $("goDuelo"); if (duelo) duelo.onclick = () => { cargar(S.id || "r:3"); ponerModo(2); ver("pista"); };
-  pintarCurso(); pintarRock(); cargar("c:n.0"); ponerModo(1); construirDif();
+  pintarCurso(); pintarRock(); cargar("c:n.0"); ponerModo(1); construirDif(); pintarMis();
   S.ult = performance.now(); S.raf = requestAnimationFrame(bucle);
 }
 construirUI();

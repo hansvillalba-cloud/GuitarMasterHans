@@ -1,4 +1,17 @@
-# Guitar Master AI V1.7.1
+# Guitar Master AI V1.9
+
+## Novedades de V1.9
+
+- **MP3 → pista (experimental):** «🎵 MP3 → pista» convierte un MP3/WAV de tu galería en notas para la pista con el modelo Basic Pitch de Spotify, que corre en tu navegador (necesita internet la primera vez para descargar el modelo y sus librerías desde esm.sh/jsDelivr). Elige «melodía principal» o «todas las notas». Es una transcripción automática: en mezclas con batería y voz habrá errores. El audio original suena sincronizado y respeta la velocidad elegida; usa audífonos. Procesa hasta los primeros 4 minutos.
+
+## V1.8
+
+## Novedades de V1.8
+
+- **Mis tablaturas:** en la pista, «＋ Agregar tablaturas» acepta varios archivos Guitar Pro a la vez (.gp3, .gp4, .gp5, .gpx, .gp) y los guarda en la misma biblioteca del dispositivo que usa el módulo Biblioteca. Quedan en una lista, sin volver a cargarlos. No se suben a ningún servidor ni a GitHub.
+- **Selector de pista:** elige guitarra rítmica, solo, limpia, bajo, etc. del mismo arreglo.
+
+## V1.7.1
 
 ## V1.7.1
 
