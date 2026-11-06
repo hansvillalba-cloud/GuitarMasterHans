@@ -1,4 +1,12 @@
-# Guitar Master AI V1.9.1
+# Guitar Master AI V2.0
+
+## V2.0
+
+- **Pantalla completa (⛶):** la pista ocupa toda la pantalla; con «2 jugadores» se ven las dos pistas, los dos puntajes y los dos diagramas de dedos a la vez (en horizontal van lado a lado). Botones flotantes para jugar/detener, cambiar entre 1 y 2 jugadores, ocultar los controles y salir.
+- **Retraso del sonido de −2000 a 3000 ms** con botones de ajuste fino (±10 y ±100). Valores negativos para una pantalla duplicada en TV (la imagen llega tarde); positivos para audífonos Bluetooth.
+- Con valores negativos, el retraso ya no se resta al juzgar los aciertos.
+
+## V1.9.1
 
 ## V1.9.1 · Sincronía
 

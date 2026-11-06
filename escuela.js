@@ -379,7 +379,7 @@ function detectar(J, now){
 }
 function evaluar(J){
   if (!S.corriendo || !J.an) return;
-  const nt = S.cancion.notas, tk = S.tick - (S.lat + S.mic) * tpms(), gr = S.cancion.grupos;
+  const nt = S.cancion.notas, tk = S.tick - (Math.max(S.lat, 0) + S.mic) * tpms(), gr = S.cancion.grupos;
   for (let i = primero(nt, tk - 1700); i < nt.length && nt[i].ini <= tk + 220; i++){
     const g = nt[i].gid; if (J.hit.has(g) || J.miss.has(g)) continue;
     const fin = nt[i].ini + Math.min(Math.max(nt[i].dur * .6, 360), 1500);
@@ -551,6 +551,17 @@ async function calibrar(){
   guardarSync(); res.textContent = "Listo: retraso del micrófono " + S.mic + " ms (guardado). Puedes afinarlo con el control si hace falta.";
 }
 
+
+/* ================= PANTALLA COMPLETA ================= */
+async function pantallaCompleta(on){
+  const v = $("view-pista"); if (on === undefined) on = !v.classList.contains("pj-full");
+  v.classList.toggle("pj-full", on); if (!on) v.classList.remove("pj-ocultar");
+  if (on){ try{ await (v.requestFullscreen || v.webkitRequestFullscreen).call(v); } catch (e){} try{ await screen.orientation.lock("landscape"); } catch (e){} }
+  else { if (document.fullscreenElement) try{ await document.exitFullscreen(); } catch (e){} try{ screen.orientation.unlock(); } catch (e){} }
+  $("pFull").textContent = on ? "⛶ Salir de pantalla completa" : "⛶ Pantalla completa";
+  setTimeout(() => S.todos.forEach(J => J.pista.resize()), 150);
+}
+
 /* ================= INTERFAZ ================= */
 function ver(nombre){
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + nombre));
@@ -585,15 +596,16 @@ function construirUI(){
       <select id="pModo"><option value="1">1 jugador</option><option value="2">2 jugadores</option></select>
       <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label><label><input type="checkbox" id="pNom"> Nombres de nota</label>
       <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><select id="pMis"><option value="">Mis tablaturas (0)</option></select><select id="pTrack" style="display:none" title="Pista del arreglo"></select><label class="btn btn-secondary btn-small" for="pGP">＋ Agregar tablaturas</label><input type="file" id="pGP" multiple hidden><select id="pMp3Modo" title="Qué notas extraer del MP3"><option value="melodia">MP3: melodía principal</option><option value="todas">MP3: todas las notas</option></select><label class="btn btn-secondary btn-small" for="pMp3">🎵 MP3 → pista</label><input type="file" id="pMp3" hidden><label><input type="checkbox" id="pAud" checked> Audio original</label>
-      <button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
+      <button class="btn btn-secondary btn-small" id="pFull">⛶ Pantalla completa</button><button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
     <details class="pj-sync"><summary>⚙ Sincronía y retraso</summary>
-      <label>Retraso del sonido: <b id="pLatV">0</b> ms <input type="range" id="pLat" min="-300" max="600" step="10" value="0"></label>
-      <small>Si oyes la música DESPUÉS de que la nota llega a la línea (típico con audífonos Bluetooth), sube este valor. Si la oyes antes, bájalo.</small>
-      <label>Retraso del micrófono: <b id="pMicV">150</b> ms <input type="range" id="pMic" min="0" max="500" step="10" value="150"></label>
+      <label>Retraso del sonido: <b id="pLatV">0</b> ms <input type="range" id="pLat" min="-2000" max="3000" step="10" value="0"></label><div class="pj-step"><span>Ajuste fino:</span><button class="btn btn-secondary btn-small" data-lat="-100">−100</button><button class="btn btn-secondary btn-small" data-lat="-10">−10</button><button class="btn btn-secondary btn-small" data-lat="10">+10</button><button class="btn btn-secondary btn-small" data-lat="100">+100</button></div>
+      <small>Rango de −2000 a 3000 ms. Si oyes la música DESPUÉS de que la nota llega a la línea (audífonos Bluetooth), pon un valor positivo. Si ves la imagen DESPUÉS de oír el sonido (pantalla duplicada en una TV), pon un valor negativo.</small>
+      <label>Retraso del micrófono: <b id="pMicV">150</b> ms <input type="range" id="pMic" min="0" max="1000" step="10" value="150"></label>
       <small>Si tus aciertos se marcan tarde o fallas notas que tocaste a tiempo, sube este valor. «Calibrar» lo mide por ti.</small>
-      <button class="btn btn-secondary btn-small" id="pCal">🎯 Calibrar micrófono</button></details>
+      <button class="btn btn-secondary btn-small" id="pCal">🎯 Calibrar micrófono</button><small>Calibra mirando la pantalla del celular o del computador, no la de la TV.</small></details>
     <p class="pj-res" id="pRes"></p><div class="pj-grid p1" id="pPlayers">${jugador(1)}${jugador(2)}</div>
-    <p class="muted">Dos jugadores: usa dos interfaces, o una estéreo con canal 1 para uno y canal 2 para el otro. Con audífonos la guía no entra en el micrófono.</p></section>`);
+    <p class="muted">Dos jugadores: usa dos interfaces, o una estéreo con canal 1 para uno y canal 2 para el otro. Con audífonos la guía no entra en el micrófono.</p>
+    <div class="pj-fab"><button id="fabPlay">▶ / ■</button><button id="fabModo">👥 1 / 2</button><button id="fabMenu">☰ Controles</button><button id="fabExit">✕ Salir</button></div></section>`);
   S.todos = [1, 2].map(i => ({i, pista:new Pista($("cv" + i)), hit:new Set(), miss:new Set(), pts:0, racha:0, ac:0, fa:0, det:null, h:[], t:0, ult:0, an:null}));
   S.jug = S.todos.slice(0, 1);
   document.body.addEventListener("click", e => {
@@ -604,9 +616,11 @@ function construirUI(){
   $("pSong").onchange = e => cargar(e.target.value);
   $("pModo").onchange = e => ponerModo(+e.target.value);
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
-  $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
+  $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar;
+  $("pFull").onclick = () => pantallaCompleta(); $("fabExit").onclick = () => pantallaCompleta(false); $("fabPlay").onclick = () => $("pStart").click(); $("fabMenu").onclick = () => $("view-pista").classList.toggle("pj-ocultar"); $("fabModo").onclick = () => ponerModo(S.modo === 1 ? 2 : 1);
+  document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && $("view-pista").classList.contains("pj-full")) pantallaCompleta(false); }); $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
   $("pGP").onchange = async e => { const fs = [...e.target.files]; e.target.value = ""; if (fs.length) await agregarGP(fs); };
-  $("pLat").oninput = e => { S.lat = +e.target.value; guardarSync(); }; $("pMic").oninput = e => { S.mic = +e.target.value; guardarSync(); }; $("pCal").onclick = calibrar; guardarSync();
+  $("pLat").oninput = e => { S.lat = +e.target.value; guardarSync(); }; document.querySelector(".pj-step").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.lat = Math.max(-2000, Math.min(3000, S.lat + +b.dataset.lat)); guardarSync(); }; $("pMic").oninput = e => { S.mic = +e.target.value; guardarSync(); }; $("pCal").onclick = calibrar; guardarSync();
   $("pMp3").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (f) await mp3APista(f); };
   $("pMis").onchange = async e => { const r = MIS.find(x => x.id === e.target.value); if (!r) return; try{ cargarGP(new Uint8Array(await r.blob.arrayBuffer()), r.name); } catch (err){ toast("No se pudo abrir " + r.name + ": " + err.message); } };
   $("pTrack").onchange = e => { if (S.gp) try{ cargarGP(S.gp.bytes, S.gp.nombre, +e.target.value); } catch (err){ toast(err.message); } };
