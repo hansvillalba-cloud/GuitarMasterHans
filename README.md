@@ -1,4 +1,11 @@
-# Guitar Master AI V1.9
+# Guitar Master AI V1.9.1
+
+## V1.9.1 · Sincronía
+
+- **El audio manda el tiempo:** con un MP3 la pista espera a que el audio arranque de verdad (en el celular tarda) y se mantiene alineada con él.
+- **⚙ Sincronía y retraso:** «Retraso del sonido» (audífonos Bluetooth) y «Retraso del micrófono» (detección de notas), guardados en el dispositivo, más un botón **🎯 Calibrar micrófono** que lo mide con 8 notas.
+
+## V1.9
 
 ## Novedades de V1.9
 

@@ -345,10 +345,12 @@ function yin(b, sr){
 const CAN = [];                                   // todas las canciones disponibles
 CURSO.forEach((m, mi) => m.l.forEach((l, li) => CAN.push({id:`c:${m.k}.${li}`, grupo:"Curso · " + m.n, nombre:l.t, bpm:l.b, tab:l.tab})));
 ROCK.forEach((r, i) => CAN.push({id:`r:${i}`, grupo:"Rock · " + r[1], nombre:r[0], bpm:r[3], tab:r[4]}));
-const S = {aud:null, audIni:false, audioUrl:null, todos:[], cancion:null, id:"", jug:[], corriendo:false, tick:0, ult:0, vel:1, ctx:null, gi:0, beat:0, modo:1, raf:0};
+const SYNC = JSON.parse(localStorage.getItem("gm_sync") || "{}");
+const S = {lat:SYNC.lat ?? 0, mic:SYNC.mic ?? 150, audOn:false, aud:null, audIni:false, audioUrl:null, todos:[], cancion:null, id:"", jug:[], corriendo:false, tick:0, ult:0, vel:1, ctx:null, gi:0, beat:0, modo:1, raf:0};
 const prog = JSON.parse(localStorage.getItem("gm_curso") || "{}");
 const guardarProg = () => localStorage.setItem("gm_curso", JSON.stringify(prog));
 
+const tpms = () => tempoEn(S.cancion.tempos, S.tick) * 960 / 60000 * S.vel;      // ticks por milisegundo real
 function cargar(id){
   const c = CAN.find(x => x.id === id); if (!c) return;
   limpiarAudio(); S.id = id; S.gp = null; S.cancion = parseTab(c.tab, c.bpm, c.nombre); reiniciar(); if ($("pTrack")) $("pTrack").style.display = "none";
@@ -357,7 +359,7 @@ function cargar(id){
   if ($("pNom")) S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; });
 }
 function reiniciar(){
-  if (S.aud) S.aud.pause(); S.audIni = false; S.corriendo = false; S.tick = -3840;
+  if (S.aud) S.aud.pause(); S.audIni = false; S.audOn = false; S.corriendo = false; S.tick = -3840;
   S.jug.forEach(J => { J.dk = null; J.hit = new Set(); J.miss = new Set(); J.pts = 0; J.racha = 0; J.ac = 0; J.fa = 0; J.pista.set(S.cancion); });
   $("pStart").textContent = "▶ Jugar"; $("pRes").textContent = "";
 }
@@ -370,14 +372,14 @@ function pluck(m, ms){
 function click(fuerte){ const c = S.ctx; if (!c) return; const o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.frequency.value = fuerte ? 1500 : 1000; g.gain.setValueAtTime(.15, t); g.gain.exponentialRampToValueAtTime(.0001, t + .05); o.connect(g).connect(c.destination); o.start(t); o.stop(t + .06); }
 
 function detectar(J, now){
-  if (!J.an || now - J.t < 40) return; J.t = now; J.an.getFloatTimeDomainData(J.buf);
+  if (!J.an || !S.ctx || now - J.t < 40) return; J.t = now; J.an.getFloatTimeDomainData(J.buf);
   const f = yin(J.buf, S.ctx.sampleRate);
   if (f > 0){ J.h.push(69 + 12 * Math.log2(f / 440)); if (J.h.length > 3) J.h.shift(); J.det = [...J.h].sort((a, b) => a - b)[J.h.length >> 1]; J.ult = now; }
   else { J.h.length = 0; if (now - J.ult > 160) J.det = null; }
 }
 function evaluar(J){
   if (!S.corriendo || !J.an) return;
-  const nt = S.cancion.notas, tk = S.tick, gr = S.cancion.grupos;
+  const nt = S.cancion.notas, tk = S.tick - (S.lat + S.mic) * tpms(), gr = S.cancion.grupos;
   for (let i = primero(nt, tk - 1700); i < nt.length && nt[i].ini <= tk + 220; i++){
     const g = nt[i].gid; if (J.hit.has(g) || J.miss.has(g)) continue;
     const fin = nt[i].ini + Math.min(Math.max(nt[i].dur * .6, 360), 1500);
@@ -398,13 +400,19 @@ function bucle(now){
   const dt = Math.min(100, now - S.ult); S.ult = now;
   try{
     if (S.corriendo){
-      S.tick += dt * tempoEn(S.cancion.tempos, S.tick) * 960 / 60000 * S.vel;
+      const espera = S.audioUrl && $("pAud").checked && S.tick >= 0 && !S.audOn;
+      if (espera){
+        if (!S.audIni){ S.aud = S.aud || Object.assign(new Audio(S.audioUrl), {preservesPitch:true}); S.aud.currentTime = 0; S.aud.playbackRate = S.vel; S.aud.play().catch(() => {}); S.audIni = true; }
+        S.tick = 0; if (S.aud.currentTime > .02) S.audOn = true;                    // espera a que el audio arranque de verdad
+      } else {
+        S.tick += dt * tpms();
+        if (S.audOn && !S.aud.paused){ const d = S.aud.currentTime * 1920 - S.tick; S.tick += Math.abs(d) > 1500 ? d : d * .2; }   // el audio manda: la pista no se desfasa
+      }
       const b = Math.floor(S.tick / 960); if (b !== S.beat){ S.beat = b; if ($("pMet").checked) click(((b % 4) + 4) % 4 === 0); }
       const nt = S.cancion.notas; while (S.gi < nt.length && nt[S.gi].ini <= S.tick){ if ($("pGuia").checked) pluck(nt[S.gi].midi, nt[S.gi].dur * 60000 / (960 * tempoEn(S.cancion.tempos, S.tick))); S.gi++; }
-      if (S.tick >= 0 && S.audioUrl && !S.audIni && $("pAud").checked){ S.aud = S.aud || Object.assign(new Audio(S.audioUrl), {preservesPitch:true}); S.aud.currentTime = 0; S.aud.playbackRate = S.vel; S.aud.play().catch(() => {}); S.audIni = true; }
       if (S.tick > S.cancion.total + 480) terminar();
     }
-    S.jug.forEach(J => { detectar(J, now); evaluar(J); hud(J, J.pista.draw(S.tick, J)); });
+    S.jug.forEach(J => { detectar(J, now); evaluar(J); hud(J, J.pista.draw(S.tick - S.lat * tpms(), J)); });
   } catch (e){ $("pRes").textContent = "Error: " + e.message; }
 }
 function terminar(){
@@ -506,7 +514,7 @@ function mp3ASong(notasT, modo, nombre, dur){
   }
   return cerrar(out, Math.round(dur * 1920), nombre, 6, [[0, 120]]);                // 120 BPM fijos = 1920 ticks por segundo de audio
 }
-function limpiarAudio(){ if (S.aud) S.aud.pause(); S.aud = null; S.audIni = false; if (S.audioUrl) URL.revokeObjectURL(S.audioUrl); S.audioUrl = null; }
+function limpiarAudio(){ if (S.aud) S.aud.pause(); S.aud = null; S.audIni = false; S.audOn = false; if (S.audioUrl) URL.revokeObjectURL(S.audioUrl); S.audioUrl = null; }
 async function mp3APista(f){
   const msg = t => { $("pRes").textContent = t; };
   try{
@@ -521,6 +529,26 @@ async function mp3APista(f){
     limpiarAudio(); S.gp = null; S.id = "mp3"; S.cancion = s; S.audioUrl = URL.createObjectURL(f); $("pGuia").checked = false; $("pTrack").style.display = "none"; reiniciar();
     msg(`Borrador listo: ${s.notas.length} notas${cortado ? " (solo los primeros 4 minutos)" : ""}. Es una transcripción automática y puede tener errores; sonará el audio original. Usa audífonos.`);
   } catch (err){ msg("No se pudo convertir el MP3: " + err.message); }
+}
+
+
+/* ================= SINCRONÍA ================= */
+function guardarSync(){ localStorage.setItem("gm_sync", JSON.stringify({lat:S.lat, mic:S.mic})); $("pLat").value = S.lat; $("pMic").value = S.mic; $("pLatV").textContent = S.lat; $("pMicV").textContent = S.mic; }
+async function calibrar(){
+  const J = S.jug[0]; if (!J.an) return toast("Primero conecta el micrófono"); if (S.corriendo) return toast("Detén la canción antes de calibrar");
+  const res = $("pRes"), N = 8, P = 700, t0 = performance.now() + 2000, ons = []; let prev = 0;
+  res.textContent = "Cuando la franja se ponga naranja, toca una nota y apágala con la mano. Son 8 veces.";
+  await new Promise(ok => { const paso = () => {
+    const now = performance.now();
+    res.style.background = now >= t0 && (now - t0) % P < 160 ? "#ff9638" : ""; res.style.color = res.style.background ? "#1a1405" : "";
+    J.an.getFloatTimeDomainData(J.buf); let s = 0; for (let i = J.buf.length - 512; i < J.buf.length; i++) s += J.buf[i] * J.buf[i];
+    const r = Math.sqrt(s / 512), k = Math.round((now - t0) / P);
+    if (r > .04 && prev < .02 && k >= 0 && k < N) ons.push(now - (t0 + k * P));
+    prev = r; if (now > t0 + N * P) return ok(); requestAnimationFrame(paso); }; paso(); });
+  res.style.background = res.style.color = "";
+  if (ons.length < 4){ res.textContent = "No pude medirlo (solo " + ons.length + " notas). Toca más fuerte, apaga la cuerda entre notas o ajusta el retraso a mano."; return; }
+  ons.sort((a, b) => a - b); S.mic = Math.max(0, Math.min(500, Math.round(ons[ons.length >> 1] + 100)));   // +100 ms: lo que tarda el detector de tono en estabilizarse
+  guardarSync(); res.textContent = "Listo: retraso del micrófono " + S.mic + " ms (guardado). Puedes afinarlo con el control si hace falta.";
 }
 
 /* ================= INTERFAZ ================= */
@@ -558,6 +586,12 @@ function construirUI(){
       <label><input type="checkbox" id="pGuia" checked> Guía sonora</label><label><input type="checkbox" id="pMet" checked> Metrónomo</label><label><input type="checkbox" id="pNom"> Nombres de nota</label>
       <button class="btn btn-secondary btn-small" id="pConn">Conectar micrófonos</button><select id="pMis"><option value="">Mis tablaturas (0)</option></select><select id="pTrack" style="display:none" title="Pista del arreglo"></select><label class="btn btn-secondary btn-small" for="pGP">＋ Agregar tablaturas</label><input type="file" id="pGP" multiple hidden><select id="pMp3Modo" title="Qué notas extraer del MP3"><option value="melodia">MP3: melodía principal</option><option value="todas">MP3: todas las notas</option></select><label class="btn btn-secondary btn-small" for="pMp3">🎵 MP3 → pista</label><input type="file" id="pMp3" hidden><label><input type="checkbox" id="pAud" checked> Audio original</label>
       <button class="btn btn-primary" id="pStart">▶ Jugar</button></div>
+    <details class="pj-sync"><summary>⚙ Sincronía y retraso</summary>
+      <label>Retraso del sonido: <b id="pLatV">0</b> ms <input type="range" id="pLat" min="-300" max="600" step="10" value="0"></label>
+      <small>Si oyes la música DESPUÉS de que la nota llega a la línea (típico con audífonos Bluetooth), sube este valor. Si la oyes antes, bájalo.</small>
+      <label>Retraso del micrófono: <b id="pMicV">150</b> ms <input type="range" id="pMic" min="0" max="500" step="10" value="150"></label>
+      <small>Si tus aciertos se marcan tarde o fallas notas que tocaste a tiempo, sube este valor. «Calibrar» lo mide por ti.</small>
+      <button class="btn btn-secondary btn-small" id="pCal">🎯 Calibrar micrófono</button></details>
     <p class="pj-res" id="pRes"></p><div class="pj-grid p1" id="pPlayers">${jugador(1)}${jugador(2)}</div>
     <p class="muted">Dos jugadores: usa dos interfaces, o una estéreo con canal 1 para uno y canal 2 para el otro. Con audífonos la guía no entra en el micrófono.</p></section>`);
   S.todos = [1, 2].map(i => ({i, pista:new Pista($("cv" + i)), hit:new Set(), miss:new Set(), pts:0, racha:0, ac:0, fa:0, det:null, h:[], t:0, ult:0, an:null}));
@@ -572,6 +606,7 @@ function construirUI(){
   $("pVel").onchange = () => { S.vel = +$("pVel").value; };
   $("pNom").onchange = () => S.todos.forEach(J => { J.pista.nombres = $("pNom").checked; }); $("pConn").onclick = conectar; $("pStart").onclick = jugar; $("rockFiltro").onchange = pintarRock; $("rockBanda").onchange = pintarRock;
   $("pGP").onchange = async e => { const fs = [...e.target.files]; e.target.value = ""; if (fs.length) await agregarGP(fs); };
+  $("pLat").oninput = e => { S.lat = +e.target.value; guardarSync(); }; $("pMic").oninput = e => { S.mic = +e.target.value; guardarSync(); }; $("pCal").onclick = calibrar; guardarSync();
   $("pMp3").onchange = async e => { const f = e.target.files[0]; e.target.value = ""; if (f) await mp3APista(f); };
   $("pMis").onchange = async e => { const r = MIS.find(x => x.id === e.target.value); if (!r) return; try{ cargarGP(new Uint8Array(await r.blob.arrayBuffer()), r.name); } catch (err){ toast("No se pudo abrir " + r.name + ": " + err.message); } };
   $("pTrack").onchange = e => { if (S.gp) try{ cargarGP(S.gp.bytes, S.gp.nombre, +e.target.value); } catch (err){ toast(err.message); } };
